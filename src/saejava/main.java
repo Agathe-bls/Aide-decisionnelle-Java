@@ -8,7 +8,7 @@ package saejava;
  *
  * @author zynga
  */
-public class SaeJava {
+public class main {
 
     /**
      * @param args the command line arguments
