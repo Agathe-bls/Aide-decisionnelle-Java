@@ -10,7 +10,7 @@ import org.graphstream.graph.Graph;
  *
  * @author zynga
  */
-public class main {
+public class Main {
 
     /**
      * @param args the command line arguments
