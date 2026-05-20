@@ -9,7 +9,7 @@ public class Main {
         System.out.println("Test");
         Graph gtest = MonGraphe.chargerGraphe("graphe2.csv");
         System.out.println("Sommets : " + gtest.getNodeCount());
-    System.out.println("Routes : " + gtest.getEdgeCount());
+        System.out.println("Routes : " + gtest.getEdgeCount());
         gtest.display();
     }
     
