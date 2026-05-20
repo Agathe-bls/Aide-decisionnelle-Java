@@ -4,6 +4,8 @@
  */
 package saejava;
 
+import org.graphstream.graph.Graph;
+
 /**
  *
  * @author zynga
@@ -15,6 +17,8 @@ public class main {
      */
     public static void main(String[] args) {
         System.out.println("Neuille");
+        Graph gtest = CarteDistrictAleatoire.createRandom(30,5);
+        gtest.display();
     }
     
 }
