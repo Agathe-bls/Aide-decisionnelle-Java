@@ -13,17 +13,8 @@ import org.graphstream.graph.implementations.SingleGraph;
  *
  * @author Agathe
  */
-public class CarteDistrictAleatoire {
+public class MonGraphe {
     //ICI JE CRéERAIS LA FONCTION POUR LE GRAPHE ALéATOIRE
-    public static Graph createRandom(int N, int avg){
-        Graph graph = new SingleGraph("G3");
-        Generator gen = new RandomGenerator(avg);
-        gen.addSink(graph);
-        gen.begin();
-        for(int i=graph.getNodeCount(); i<N; i++) //ATTENTION AU DEBUT DU I
-            gen.nextEvents();
-        gen.end();
-        
-        return graph;
-    }
+    //Mattis import 
+    
 }
