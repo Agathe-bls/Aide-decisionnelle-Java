@@ -9,5 +9,6 @@ package classe;
  * @author zynga
  */
 public class Centre {
-    
+    private String id;
+    private TypeCentre type;
 }
