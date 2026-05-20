@@ -27,4 +27,5 @@ public class MonGraphe {
         gen.end();
         
         return graph;
+    }
 }
