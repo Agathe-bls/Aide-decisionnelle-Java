@@ -17,7 +17,7 @@ public class main {
      */
     public static void main(String[] args) {
         System.out.println("Neuille");
-        Graph gtest = CarteDistrictAleatoire.createRandom(30,5);
+        Graph gtest = MonGraphe.createRandom(30);
         gtest.display();
     }
     
