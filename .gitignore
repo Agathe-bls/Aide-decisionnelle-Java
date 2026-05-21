@@ -51,3 +51,7 @@ Thumbs.db
 *.ear
 *.zip
 *.tar.gz
+
+# On versionne les librairies Java du projet
+!lib/
+!lib/*.jar
