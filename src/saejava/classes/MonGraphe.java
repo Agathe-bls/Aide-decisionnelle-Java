@@ -81,9 +81,9 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
                     Node n1 = this.getNode(ligne[0]);
                     Node n2 = this.getNode("S"+(j+1));
                     Edge route = this.addEdge(ligne[0]+"/S"+(j+1), n1, n2);
-                    route.addAttribute("fiabilite", infoRoute[0].trim());
-                    route.addAttribute("distance", infoRoute[1].trim());
-                    route.addAttribute("duree", infoRoute[2].trim());
+                    route.addAttribute("fiabilite", Double.valueOf(infoRoute[0].trim()));
+                    route.addAttribute("distance", Integer.valueOf(infoRoute[1].trim()));
+                    route.addAttribute("duree", Integer.valueOf(infoRoute[2].trim()));
                 }
             }
         }
@@ -100,7 +100,7 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
 
     public Graph creerGrapheAleatoire(int N){        
         for (int i=0; i<N; i++){
-            Node n = this.addNode("cA"+i);
+            Node n = this.addNode("S"+i);
             n.addAttribute("type", choisirTypeCAlea());
         }
         
@@ -131,7 +131,7 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
                 if(n != nV){
                     if(!n.hasEdgeBetween(nV)){
                         Edge e = this.addEdge(nV.getId()+ "/" +n.getId(), nV, n);
-                        e.addAttribute("fiabilite", RandomGenerator.getDefault().nextInt(2,11)/10);
+                        e.addAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(2,10.1)/10);
                         e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10,51));
                         e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10,121));
                     }
@@ -152,22 +152,45 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
         }
     }
     
-    private void verifierCentresSeuls(){
-        for(Node n : this){
-            if(n.getDegree() == 0){
-                String randomIdCentre = "c" + RandomGenerator.getDefault().nextInt(this.getNodeCount());
-                while(randomIdCentre.equals(n.getId())){
-                    randomIdCentre = "c" + RandomGenerator.getDefault().nextInt(this.getNodeCount());
-                }
-                Node nAlea = this.getNode(randomIdCentre);
-                Edge e = this.addEdge(nAlea.getId()+ "/" +n.getId(), nAlea, n);
-                
-                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextInt(2,11)/10);
-                e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10,51));
-                e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10,121));
-                
+    private void verifierCentresSeuls() {
+        //et graphe non connexe donc je fais une liaison entre chaque centre mais est ce que ducoup c'est vraiment aléatoire ?
+        //AVEC FIABILITE plus grande que 0.25 pour pas faire beuguer pour le plus cours chemin !!!
+        for (int i = 1; i < this.getNodeCount(); i++) {
+            Node precedent = this.getNode("S" + (i - 1));
+            Node actuel = this.getNode("S" + i);
+
+            if (!actuel.hasEdgeBetween(precedent)) {
+                Edge e = this.addEdge(precedent.getId() + "/" + actuel.getId(), precedent, actuel);
+
+                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(3, 10.1) / 10);
+                e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10, 51));
+                e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10, 121));
             }
+            if ((double)(actuel.getEdgeBetween(precedent).getAttribute("fiabilite")) < 0.25){
+                Edge e = actuel.getEdgeBetween(precedent);
                 
+                e.setAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(3, 10.1) / 10);
+            }
         }
     }
+    
+    
+//    private void verifierCentresSeuls(){
+//        for(Node n : this){
+//            if(n.getDegree() == 0){
+//                String randomIdCentre = "S" + RandomGenerator.getDefault().nextInt(this.getNodeCount());
+//                while(randomIdCentre.equals(n.getId())){
+//                    randomIdCentre = "S" + RandomGenerator.getDefault().nextInt(this.getNodeCount());
+//                }
+//                Node nAlea = this.getNode(randomIdCentre);
+//                Edge e = this.addEdge(nAlea.getId()+ "/" +n.getId(), nAlea, n);
+//                
+//                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(2,10.1)/10);
+//                e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10,51));
+//                e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10,121));
+//                
+//            }
+//                
+//        }
+//    }
 }

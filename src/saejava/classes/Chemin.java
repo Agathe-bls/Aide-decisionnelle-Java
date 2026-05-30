@@ -15,12 +15,15 @@ import org.graphstream.graph.Node;
  * @author Agathe
  */
 public class Chemin {
+
     private MonGraphe grapheAssocie;
-            
+
     private double fiabiliteTotale;
     private int distanceTotale;
     private int dureeTotale;
+    private double dureeEstimee;    //avec la fiabilité
     private ArrayList<Node> centresTraverses;
+    private ArrayList<Edge> routesTraversees;
 
     public Chemin(MonGraphe grapheAssocie) {
         this.grapheAssocie = grapheAssocie;
@@ -28,92 +31,175 @@ public class Chemin {
         this.distanceTotale = 0;
         this.dureeTotale = 0;
         this.centresTraverses = new ArrayList<>();
+        this.routesTraversees = new ArrayList<>();
     }
-    
     //NORMALEMENT IL Y A PAS DE PROBLEME MAIS IL FAUT PEUT ETRE METTRE UNE EXCEPTION POUR ETRE SUR QUE DEPART/GRAPH/ARRIVEE VIENNENT BIEN DU MËME GRAPHE
-    
+
     //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
-    public Chemin cheminFiableDijskra(Node depart, Node arrivee){
-        this.fiabiliteTotale = 0.0;
-        this.distanceTotale = 0;
-        this.dureeTotale = 0;
-        this.centresTraverses.clear();
-        
-        HashMap<Node, ArrayList> infosTableauDijkstra = new HashMap<>();
-        
-        initTableauDijkstra(infosTableauDijkstra, depart);
-        
-        //regarder pour chaque centre un par un en prenant celui avec la plus petite fiabilité si en le rajoutant aux chemin il permet de diminuer sa fiabilité
-        while(!finTraitement(infosTableauDijkstra)){
+    public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
+        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
+
+        //regarder pour chaque centre non traité un par un en prenant celui avec la plus petite durée Estimée si en le rajoutant aux chemin il permet de diminuer sa durée Estimée
+        while (!finTraitement(infosTableauDijkstra)) {
             Node nTraite = centreAValeurMin(infosTableauDijkstra);
-            double fiaActuel = (double)(infosTableauDijkstra.get(nTraite).get(0));
-            
+            double EstimationActuel = (infosTableauDijkstra.get(nTraite).coutCalcule);
+
             Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
-            while(itVoisins.hasNext()){
+            while (itVoisins.hasNext()) {
                 Node voisin = itVoisins.next();
-                if((boolean)(infosTableauDijkstra.get(voisin).get(2)) == false){
-                    double fiaAvecVoisin = fiaActuel + (double)(voisin.getEdgeBetween(nTraite).getAttribute("duree"))*(20 - (double)(voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")))/10;
-                    if(fiaAvecVoisin < (double)(infosTableauDijkstra.get(voisin).get(0))){
-                        infosTableauDijkstra.get(voisin).set(0, fiaAvecVoisin);
-                        infosTableauDijkstra.get(voisin).set(1, nTraite);
+                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double)voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
+                    double EstimationAvecVoisin = EstimationActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree")) * (20 - (double) (voisin.getEdgeBetween(nTraite).getAttribute("fiabilite"))) / 10;
+                    if (EstimationAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
+                        infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
+                        infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
                     }
                 }
             }
-            infosTableauDijkstra.get(nTraite).set(2, true);
+            infosTableauDijkstra.get(nTraite).estTraite = true;
         }
-        
         //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
         Node debut = arrivee;
-        this.fiabiliteTotale = (double)(infosTableauDijkstra.get(debut).get(0));
-        while(debut != depart){
-            Edge entreDeux = debut.getEdgeBetween((Node)infosTableauDijkstra.get(debut).get(1));//FAIRE ATTENTION ICI IL FAUT QUE JE VERIFIE CE QUE J4AI FAIS
+        this.dureeEstimee = (infosTableauDijkstra.get(debut).coutCalcule);
+        while (debut != depart) {
+            Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
             this.centresTraverses.add(debut);
-            this.distanceTotale += (Integer)(entreDeux.getAttribute("distance"));
-            this.dureeTotale += (Integer)(entreDeux.getAttribute("duree"));
+            this.routesTraversees.add(entreDeux);
+            this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
+            this.dureeTotale += (Integer) (entreDeux.getAttribute("duree"));
+            this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
 
-            debut = (Node)(infosTableauDijkstra.get(debut).get(1)); //FAIRE ATTENTION ICI IL FAUT QUE JE VERIFIE CE QUE J4AI FAIS je suis vraiment obligee de cast ???
+            debut = (infosTableauDijkstra.get(debut).centrePrecedent);
         }
-        this.centresTraverses.add(arrivee);
-            
+        this.fiabiliteTotale = this.fiabiliteTotale / (this.centresTraverses.size() - 1);
+        this.centresTraverses.add(depart);
+
         return this;
     }
-    
-    private void initTableauDijkstra(HashMap<Node, ArrayList> infosTableauDijkstra, Node depart){
-        for(Node n : grapheAssocie.getEachNode()){
-            ArrayList fia_prec_traite = new ArrayList();
-            fia_prec_traite.add(0, 100.0);  // fiabilité du 
-            fia_prec_traite.add(1, null);   // centre précédent dans l'algo de dijcktra
-            fia_prec_traite.add(2, false);  // si le centre est traité
-            if(n == depart){
-                fia_prec_traite.set(0, 0.0);
-                
-                infosTableauDijkstra.put(n, fia_prec_traite);
+
+    public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
+        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
+
+        //regarder pour chaque centre non traité un par un en prenant celui avec la plus petite durée Estimée si en le rajoutant aux chemin il permet de diminuer sa durée Estimée
+        while (!finTraitement(infosTableauDijkstra)) {
+            Node nTraite = centreAValeurMin(infosTableauDijkstra);
+            int dureeActuel = (int) (infosTableauDijkstra.get(nTraite).coutCalcule);
+
+            Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
+            while (itVoisins.hasNext()) {
+                Node voisin = itVoisins.next();
+                if ((infosTableauDijkstra.get(voisin).estTraite) == false) {  // NORMALEMENT ON MET PAS CA : && 0.25 <= (Integer) voisin.getAttribute("fiabilite")
+                    int dureeAvecVoisin = dureeActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree"));
+                    if (dureeAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
+                        infosTableauDijkstra.get(voisin).coutCalcule = dureeAvecVoisin;
+                        infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
+                    }
+                }
             }
-            else
-                infosTableauDijkstra.put(n, fia_prec_traite);
+            infosTableauDijkstra.get(nTraite).estTraite = true;
         }
+
+        //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
+        Node debut = arrivee;
+        this.dureeTotale = (int) (infosTableauDijkstra.get(debut).coutCalcule);
+        while (debut != depart) {
+            Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
+            this.centresTraverses.add(debut);
+            this.routesTraversees.add(entreDeux);
+            this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
+            this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
+            this.dureeEstimee += (int) (entreDeux.getAttribute("duree")) * (20 - (double) (entreDeux.getAttribute("fiabilite"))) / 10;
+
+            debut = (infosTableauDijkstra.get(debut).centrePrecedent);
+        }
+        this.centresTraverses.add(depart);
+
+        return this;
     }
-    
-    private boolean finTraitement(HashMap<Node, ArrayList> infosTableauDijkstra){
+
+    //LES FONCTIONS SECONDAIRES UTILISEES POUR L'ALGO :
+    public class InfosCentresDijkstra {
+
+        private double coutCalcule;
+        private Node centrePrecedent;
+        private boolean estTraite;
+    }
+
+    private HashMap<Node, InfosCentresDijkstra> initAlgoDijkstra(Node depart) {
+        this.fiabiliteTotale = 0.0;
+        this.distanceTotale = 0;
+        this.dureeTotale = 0;
+        this.dureeEstimee = 0.0;
+        this.centresTraverses.clear();
+        this.routesTraversees.clear();
+
+        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = new HashMap<>();
+
+        for (Node n : grapheAssocie.getEachNode()) {
+            InfosCentresDijkstra infosN = new InfosCentresDijkstra();
+
+            infosN.coutCalcule = Double.POSITIVE_INFINITY;
+            infosN.centrePrecedent = null;
+            infosN.estTraite = false;
+
+            if (n == depart) {
+                infosN.coutCalcule = 0.0;
+            }
+            infosTableauDijkstra.put(n, infosN);
+        }
+        return infosTableauDijkstra;
+    }
+
+    private boolean finTraitement(HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra) {
         boolean traitementFini = true;
-        for(Node n : infosTableauDijkstra.keySet()){
-            if((boolean)(infosTableauDijkstra.get(n).get(2)) == false){
+        for (Node n : infosTableauDijkstra.keySet()) {
+            if ((infosTableauDijkstra.get(n).estTraite) == false) {
                 traitementFini = false;
             }
         }
         return traitementFini;
     }
-    
+
     //FAIRE ATTENTION AVEC LES EXCEPTIONS IL FAUT PAS QUE LA LISTE DE SOMMETS SOIT VIDE
-    private Node centreAValeurMin(HashMap<Node, ArrayList> infosTableauDijkstra){
-        double valMin = 2.0;
+    private Node centreAValeurMin(HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra) {
+        double valMin = Double.POSITIVE_INFINITY;
         Node centreMin = null;
-        for(Node n : infosTableauDijkstra.keySet()){
-            if((double)(infosTableauDijkstra.get(n).get(0))< valMin && (boolean)(infosTableauDijkstra.get(n).get(2)) == false){
-                valMin = (double)(infosTableauDijkstra.get(n).get(0));
+        for (Node n : infosTableauDijkstra.keySet()) {
+            if ((infosTableauDijkstra.get(n).coutCalcule) <= valMin && (infosTableauDijkstra.get(n).estTraite) == false) {
+                valMin = (infosTableauDijkstra.get(n).coutCalcule);
                 centreMin = n;
             }
         }
         return centreMin;
+    }
+    
+//    private MonGraphe grapheAssocie
+//    private double fiabiliteTotale;
+//    private int distanceTotale;
+//    private int dureeTotale;
+//    private double dureeEstimee;    //avec la fiabilité
+//    private ArrayList<Node> centresTraverses;
+    //Visualisation des chemins : 
+    
+    public void visualisationChemin(String typeChemin) {
+        if (typeChemin.equals("dureeMin")) {
+            for (Node n : centresTraverses) {
+                n.setAttribute("ui.style", "fill-color: #F52727;");
+            }
+            for (Edge e : routesTraversees) {
+                e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+            }
+            centresTraverses.get(1).addAttribute("ui.label", "Durée estimée :" + this.dureeEstimee);
+            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
+        } 
+        else if (typeChemin.equals("dureeEstimee")) {
+            for (Node n : centresTraverses) {
+                n.setAttribute("ui.style", "fill-color: #88D461;");
+            }
+            for (Edge e : routesTraversees) {
+                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+            }
+            centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeTotale);
+            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
+        }
     }
 }
