@@ -7,6 +7,7 @@ package saejava.classes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 
@@ -201,5 +202,35 @@ public class Chemin {
             centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeTotale);
             centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
         }
+    }
+
+    public double getFiabiliteTotale() {
+        return fiabiliteTotale;
+    }
+
+    public int getDistanceTotale() {
+        return distanceTotale;
+    }
+
+    public int getDureeTotale() {
+        return dureeTotale;
+    }
+
+    public double getDureeEstimee() {
+        return dureeEstimee;
+    }
+
+    public ArrayList<Node> getCentresTraverses() {
+        return centresTraverses;
+    }
+
+    public ArrayList<Edge> getRoutesTraversees() {
+        return routesTraversees;
+    }
+
+    @Override
+    public String toString() {
+        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
+                + dureeEstimee + "]";
     }
 }

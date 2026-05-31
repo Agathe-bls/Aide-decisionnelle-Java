@@ -2,18 +2,14 @@ package saejava.classes;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import java.util.Scanner;
-
-//Création graphe aléatoire
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Node;
 import java.util.random.RandomGenerator;
 
-import java.util.Iterator;
+import org.graphstream.graph.Edge;
+//Création graphe aléatoire
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 
 public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGLEGRAPH FAUDRA QUE JE VOUS EN PARLE
     
@@ -23,14 +19,16 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
     
     public String getTypeComplet(Node centre){
         String res = "";
-        if (centre.getAttribute("type") == "M")
+        String type = centre.getAttribute("type");
+
+        if ("M".equals(type))
             res = "Maternite";
-        else if (centre.getAttribute("type") == "O")
+        else if ("O".equals(type))
             res = "Bloc operatoire";
-        else if (centre.getAttribute("type") == "N")
+        else if ("N".equals(type))
             res = "Nutrition";
         else
-            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+            throw new IllegalArgumentException("Type invalide : " + type); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
         
         return res;
     }
@@ -81,7 +79,7 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
                     Node n1 = this.getNode(ligne[0]);
                     Node n2 = this.getNode("S"+(j+1));
                     Edge route = this.addEdge(ligne[0]+"/S"+(j+1), n1, n2);
-                    route.addAttribute("fiabilite", Double.valueOf(infoRoute[0].trim()));
+                    route.addAttribute("fiabilite", Double.valueOf(infoRoute[0].trim())/10);
                     route.addAttribute("distance", Integer.valueOf(infoRoute[1].trim()));
                     route.addAttribute("duree", Integer.valueOf(infoRoute[2].trim()));
                 }
@@ -90,6 +88,8 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
     } 
 
     public void chargerGraphe(String nomFichier) {
+        this.clear();
+
         ArrayList<String> lignes = lireCSV(nomFichier);
         creerCentres(lignes);
         creerRoutes(lignes);
@@ -171,6 +171,60 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
                 
                 e.setAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(3, 10.1) / 10);
             }
+        }
+    }
+
+    // j'ai fait ça pour plus tard et pour debuggé les graphe si jamais avec la fonction d'affichage des infos du graphe 
+    public int compterCentresParType(String typeRecherche) {
+        int compteur = 0;
+
+        for (Node n : this.getEachNode()) {
+            String type = n.getAttribute("type");
+
+            if (typeRecherche.equals(type)) {
+                compteur++;
+            }
+        }
+
+        return compteur;
+    }
+
+    public int getNbMaternites() {
+        return compterCentresParType("M");
+    }
+
+    public int getNbBlocsOperatoires() {
+        return compterCentresParType("O");
+    }
+
+    public int getNbCentresNutrition() {
+        return compterCentresParType("N");
+    }
+
+    public void afficherInfoGraphe() {
+        System.out.println("===== Info du graphe =====");
+        System.out.println("Nombre de sommets : " + this.getNodeCount());
+        System.out.println("Nombre de routes : " + this.getEdgeCount());
+
+        System.out.println("Maternités : " + getNbMaternites());
+        System.out.println("Blocs opératoires : " + getNbBlocsOperatoires());
+        System.out.println("Centres de nutrition : " + getNbCentresNutrition());
+
+        System.out.println("\n--- Sommets ---");
+        for (Node n : this.getEachNode()) {
+            System.out.println(n.getId() + " | type = " + n.getAttribute("type"));
+        }
+
+        System.out.println("\n--- Routes ---");
+        for (Edge e : this.getEachEdge()) {
+            System.out.println(
+                e.getId()
+                + " : " + e.getSourceNode().getId()
+                + " -- " + e.getTargetNode().getId()
+                + " | fiabilité = " + e.getAttribute("fiabilite")
+                + " | distance = " + e.getAttribute("distance")
+                + " | durée = " + e.getAttribute("duree")
+            );
         }
     }
     

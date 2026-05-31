@@ -1,36 +1,54 @@
 package saejava;
 
 import saejava.classes.MonGraphe;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.implementations.SingleGraph;
-import saejava.classes.Chemin;
+import saejava.classes.Vehicule;
 
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Test");
-        MonGraphe gtest = new MonGraphe("ffc");
-        gtest.chargerGraphe("graphe3.csv");
-        System.out.println("Sommets : " + gtest.getNodeCount());
-        System.out.println("Routes : " + gtest.getEdgeCount());
-        gtest.display();
+        MonGraphe g = new MonGraphe("test");
+        g.chargerGraphe("graphe2.csv");
 
-       // MonGraphe gtest = new MonGraphe("gAleatoire");
+        Vehicule v = new Vehicule(g, g.getNode("S1"));
+
+        // null = livrer tous les centres
+        v.calculerTourneeUnVehicule(null);
+
+        v.afficherTournee();
+
+        v.colorierTournee();
+        g.display();
+
+
+
+        //testerCSV("graphe4.csv");
+        //testerCSV("graphe5.csv");
+
+
+        // MonGraphe gtest = new MonGraphe("gAleatoire");
         //gtest.creerGrapheAleatoire(20);
         
         //Chemin chDuree = new Chemin(gtest);
-        Chemin chAvecFia = new Chemin(gtest);
-        Chemin chDuree = new Chemin(gtest);
+        //Chemin chAvecFia = new Chemin(gtest);
+        //Chemin chDuree = new Chemin(gtest);
         
-        chAvecFia.cheminDureeMinDijkstra(gtest.getNode("S5"), gtest.getNode("S10"));
-        chAvecFia.visualisationChemin("dureeMin");
+        //chAvecFia.cheminDureeMinDijkstra(gtest.getNode("S5"), gtest.getNode("S10"));
+        //chAvecFia.visualisationChemin("dureeMin");
         
-        chDuree.cheminDureeEstimeeDijkstra(gtest.getNode("S1"), gtest.getNode("S10"));
-        chDuree.visualisationChemin("dureeEstimee");
+        //chDuree.cheminDureeEstimeeDijkstra(gtest.getNode("S1"), gtest.getNode("S10"));
+        //chDuree.visualisationChemin("dureeEstimee");
         
-        gtest.display();
+        //gtest.display();
         
         
+    }
+
+    private static void testerCSV(String fichier) {
+        System.out.println("\nTest du fichier : " + fichier);
+
+        MonGraphe g = new MonGraphe("test-" + fichier);
+        g.chargerGraphe(fichier);
+        g.afficherInfoGraphe();
     }
     
 }
