@@ -197,7 +197,6 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
     
      public void visualisationGraphe() {
          for(Node n : this.getNodeSet()){
-             System.out.println("" + n.getAttribute("type"));
              if (n.getAttribute("type").equals("M")) {
                  n.addAttribute("ui.label", "" + n.getAttribute("type"));
                  n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
@@ -210,9 +209,6 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
              } else {
                  throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
              }
-         }
-         for (Edge e : this.getEachEdge()){
-             e.addAttribute("ui.label", "" + e.getAttribute("fiabilite"));
          }
      }
 }
