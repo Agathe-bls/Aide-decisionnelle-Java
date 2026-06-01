@@ -23,11 +23,11 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
     
     public String getTypeComplet(Node centre){
         String res = "";
-        if (centre.getAttribute("type") == "M")
+        if (centre.getAttribute("type").equals("M"))
             res = "Maternite";
-        else if (centre.getAttribute("type") == "O")
+        else if (centre.getAttribute("type").equals("O"))
             res = "Bloc operatoire";
-        else if (centre.getAttribute("type") == "N")
+        else if (centre.getAttribute("type").equals("N"))
             res = "Nutrition";
         else
             throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
@@ -193,4 +193,26 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
 //                
 //        }
 //    }
+    
+    
+     public void visualisationGraphe() {
+         for(Node n : this.getNodeSet()){
+             System.out.println("" + n.getAttribute("type"));
+             if (n.getAttribute("type").equals("M")) {
+                 n.addAttribute("ui.label", "" + n.getAttribute("type"));
+                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
+             } else if (n.getAttribute("type").equals("O")) {
+                 n.addAttribute("ui.label", "" + n.getAttribute("type"));
+                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #8FB6FA;");
+             } else if (n.getAttribute("type").equals("N")) {
+                 n.addAttribute("ui.label", "" + n.getAttribute("type"));
+                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #93FA8F;");
+             } else {
+                 throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+             }
+         }
+         for (Edge e : this.getEachEdge()){
+             e.addAttribute("ui.label", "" + e.getAttribute("fiabilite"));
+         }
+     }
 }

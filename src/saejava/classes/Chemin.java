@@ -182,24 +182,18 @@ public class Chemin {
     
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
-            for (Node n : centresTraverses) {
-                n.setAttribute("ui.style", "fill-color: #F52727;");
-            }
             for (Edge e : routesTraversees) {
                 e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
             }
-            centresTraverses.get(1).addAttribute("ui.label", "Durée estimée :" + this.dureeEstimee);
+            centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeEstimee);
             centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
-        } 
+        }
         else if (typeChemin.equals("dureeEstimee")) {
-            for (Node n : centresTraverses) {
-                n.setAttribute("ui.style", "fill-color: #88D461;");
-            }
             for (Edge e : routesTraversees) {
                 e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
             }
-            centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeTotale);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
+            centresTraverses.get(1).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
+            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px;");
         }
     }
 }
