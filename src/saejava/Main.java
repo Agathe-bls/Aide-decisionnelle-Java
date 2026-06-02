@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         MonGraphe g = new MonGraphe("test");
-        g.chargerGraphe("graphe2.csv");
+        g.chargerGraphe("graphe1.csv");
 
         Vehicule v = new Vehicule(g, g.getNode("S1"));
 

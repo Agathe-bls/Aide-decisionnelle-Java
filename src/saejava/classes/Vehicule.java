@@ -73,6 +73,7 @@ public class Vehicule {
     public void calculerTourneeUnVehicule(String type) {
         ArrayList<Node> centresPasLivres = getCentresALivrer(type);
 
+        centresLivres.add(positionActuelle);
         centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie...
 
         while(!centresPasLivres.isEmpty()) {
@@ -90,6 +91,12 @@ public class Vehicule {
             positionActuelle = centrePlusProche;
             centresPasLivres.remove(centrePlusProche);
         }
+    }
+
+    public void calculerTourneeDeuxVehicules() {
+        ArrayList<Node> centresPasLivres = getCentresALivrer(null);
+
+        centresPasLivres.remove(positionActuelle);
     }
 
     public void colorierTournee() {
