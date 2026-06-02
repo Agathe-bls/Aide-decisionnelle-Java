@@ -2,7 +2,7 @@ package saejava;
 
 import Fenetre.MaFenetre;
 import saejava.classes.MonGraphe;
-import saejava.classes.Vehicule;
+import saejava.classes.Tournee;
 
 public class Main {
 
@@ -10,14 +10,14 @@ public class Main {
         MonGraphe g = new MonGraphe("test");
         g.chargerGraphe("graphe1.csv");
 
-        Vehicule v = new Vehicule(g, g.getNode("S1"));
+        Tournee v = new Tournee(g, g.getNode("S1"), 1);
 
         // null = livrer tous les centres
         v.calculerTourneeUnVehicule(null);
 
         v.afficherTournee();
 
-        v.colorierTournee();
+        v.colorierTourneeUnVehicule();
         g.display();
 
 

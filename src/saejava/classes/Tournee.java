@@ -4,18 +4,24 @@ import java.util.ArrayList;
 
 import org.graphstream.graph.Node;
 
-public class Vehicule {
+public class Tournee {
+    private class Vehicule {
+        public ArrayList<Node> centresLivres = new ArrayList<>();
+        public ArrayList<Chemin> trajets = new ArrayList<>();
+    }
     private MonGraphe graphe;
     private Node positionActuelle;
-    private ArrayList<Node> centresLivres;
-    private ArrayList<Chemin> trajets;
+    private ArrayList<Vehicule> lstVehicules = new ArrayList<>();
     private int dureeTotale;
 
-    public Vehicule(MonGraphe graphe, Node positionActuelle) {
+    public Tournee(MonGraphe graphe, Node positionActuelle, int nbVehicule) {
         this.graphe = graphe;
         this.positionActuelle = positionActuelle;
-        this.centresLivres = new ArrayList<>();
-        this.trajets = new ArrayList<>();
+        if (nbVehicule == 1)
+            this.lstVehicules.add(new Vehicule());
+        else
+            this.lstVehicules.add(new Vehicule());
+            this.lstVehicules.add(new Vehicule());
         this.dureeTotale = 0;
     }
 
@@ -23,12 +29,12 @@ public class Vehicule {
         return positionActuelle;
     }
 
-    public ArrayList<Node> getCentresLivres() {
-        return centresLivres;
+    public ArrayList<Node> getCentresLivres(Vehicule v) {
+        return v.centresLivres;
     }
 
-    public ArrayList<Chemin> getTrajets() {
-        return trajets;
+    public ArrayList<Chemin> getTrajets(Vehicule v) {
+        return v.trajets;
     }
 
     public int getDureeTotale() {
@@ -73,7 +79,7 @@ public class Vehicule {
     public void calculerTourneeUnVehicule(String type) {
         ArrayList<Node> centresPasLivres = getCentresALivrer(type);
 
-        centresLivres.add(positionActuelle);
+        lstVehicules.get(0).centresLivres.add(positionActuelle);
         centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie...
 
         while(!centresPasLivres.isEmpty()) {
@@ -85,8 +91,8 @@ public class Vehicule {
 
             Chemin trajet = new Chemin(graphe);
             trajet.cheminDureeMinDijkstra(positionActuelle, centrePlusProche);
-            trajets.add(trajet);
-            centresLivres.add(centrePlusProche);
+            lstVehicules.get(0).trajets.add(trajet);
+            lstVehicules.get(0).centresLivres.add(centrePlusProche);
             dureeTotale += trajet.getDureeTotale();
             positionActuelle = centrePlusProche;
             centresPasLivres.remove(centrePlusProche);
@@ -99,9 +105,9 @@ public class Vehicule {
         centresPasLivres.remove(positionActuelle);
     }
 
-    public void colorierTournee() {
-        for (Chemin chemin : trajets) {
-            chemin.visualisationChemin("dureeMin");
+    public void colorierTourneeUnVehicule() {
+        for (Chemin chemin : lstVehicules.get(0).trajets) {
+            chemin.visualisationTournee(1);
         }
     }
 
@@ -109,20 +115,20 @@ public class Vehicule {
     public void afficherTournee() {
         System.out.println("===== Tournee du véhicule =====");
 
-        if (trajets.isEmpty()) {
+        if (lstVehicules.get(0).trajets.isEmpty()) {
             System.out.println("Aucun trajet calculé.");
             return;
         }
 
         System.out.println("Centres livrés :");
 
-        for (Node n : centresLivres) {
+        for (Node n : lstVehicules.get(0).centresLivres) {
             System.out.println("- " + n.getId() + " (" + n.getAttribute("type") + ")");
         }
 
         System.out.println("\nTrajets :");
 
-        for (Chemin c : trajets) {
+        for (Chemin c : lstVehicules.get(0).trajets) {
             System.out.println(c);
         }
 

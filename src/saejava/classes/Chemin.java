@@ -204,7 +204,7 @@ public class Chemin {
                 for (Edge e : routesTraversees) {
                     e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
                 }
-                centresTraverses.get(0).addAttribute("ui.label", "Durée :" + this.dureeTotale);
+                centresTraverses.get(0).addAttribute("ui.label", "" + centresTraverses.get(0).getId());
                 centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px; text-color: black;");
                 break;
             case 2:
