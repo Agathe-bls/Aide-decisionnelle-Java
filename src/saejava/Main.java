@@ -1,5 +1,6 @@
 package saejava;
 
+import Fenetre.MaFenetre;
 import saejava.classes.MonGraphe;
 import saejava.classes.Vehicule;
 
