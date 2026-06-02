@@ -197,6 +197,7 @@ public class Chemin {
        // }
    // }
     
+//HEAD
    // public void visualisationTournee(int nbVehicule) {
        // if (nbVehicule == 1) {
          //   for (Edge e : routesTraversees) {
@@ -216,7 +217,27 @@ public class Chemin {
       //  }
 
 
+    public void visualisationTournee(int nbVehicule) {
+        switch (nbVehicule) {
+            case 1:
+                for (Edge e : routesTraversees) {
+                    e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+                }
+                centresTraverses.get(0).addAttribute("ui.label", "Durée :" + this.dureeTotale);
+                centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px; text-color: black;");
+                break;
+            case 2:
+                for (Edge e : routesTraversees) {
+                    e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+                }
+                centresTraverses.get(0).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
+                centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px;");
+                break;
+
+
+            default: //Faire une fenetre d'info pour dire qu'il n'y a pas assez de vehicules
+                break;
+        }
     }
-    
-    
+}
 
