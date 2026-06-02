@@ -175,7 +175,7 @@ public class MaFenetre extends JFrame {
         pMap.setPreferredSize(new Dimension(500,500));
         grapheActuel.visualisationGraphe();
         Viewer viewer = new Viewer(grapheActuel, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
-        viewer.enableAutoLayout(); // Disposition automatique
+        viewer.enableAutoLayout();// affichage automatique
         View view = viewer.addDefaultView(false);
         
         pMap.add((Component) view, BorderLayout.CENTER);
