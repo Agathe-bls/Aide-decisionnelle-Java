@@ -221,6 +221,7 @@ public class MaFenetre extends JFrame {
                 if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     PrintWriter pw = new PrintWriter(new FileWriter(f.getSelectedFile()));
                     grapheActuel.chargerGraphe("" + pw);
+                    grapheActuel.visualisationGraphe();
                 }
                 //else //BIEN METTRE UNE EXCEPTION
                 break;
@@ -228,6 +229,7 @@ public class MaFenetre extends JFrame {
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
+                grapheActuel.visualisationGraphe();
                 break;
 
             case 2:
@@ -236,7 +238,6 @@ public class MaFenetre extends JFrame {
             default:
                 throw new IllegalStateException("Unexpected value: " + choix);
         }
-    
     }
    
     private void popup_infos_centre(){
@@ -267,7 +268,7 @@ public class MaFenetre extends JFrame {
     }
     
     private void popup_nouv_t(){
-         String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
+        String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Quel type de trajet voulez-vous ?", "Choix du trajet", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
         
         switch (choix) {
