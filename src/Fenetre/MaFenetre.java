@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.graphstream.graph.Node;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
@@ -83,7 +84,7 @@ public class MaFenetre extends JFrame {
     private JLabel trajet_c;
     private JButton envoyer;
     private JButton annuler;
-    private DefaultListModel monModele;
+   
     
     //popup info centre
     private JLabel titre_ic;
@@ -94,7 +95,10 @@ public class MaFenetre extends JFrame {
     //Est 
     
     private JLabel titre_un;
+    private DefaultListModel modeleV;
+    
     private JLabel titre_deux;
+    private DefaultListModel modeleC;
     
     public MaFenetre(){
         super("MedicOne");
@@ -108,8 +112,9 @@ public class MaFenetre extends JFrame {
     
     private void initComposantsPrincipaux(){
         JPanel pPrincipal = new JPanel(new BorderLayout());
+        pPrincipal.setPreferredSize(new Dimension(720,512));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(2, 20, 2, 20);
+        gbc.insets = new Insets(4, 35, 4, 35);
         
         //Partie Haut
         JPanel pHaut = new JPanel(new GridBagLayout());
@@ -121,7 +126,8 @@ public class MaFenetre extends JFrame {
                 popup_nouv_district();
             } catch (IOException ex) {
                 System.getLogger(MaFenetre.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-            } }) ;
+            } 
+        }) ;
         
         gbc.gridx = 0; gbc.gridy = 0;
         pHaut.add(nom_m, gbc);
@@ -187,7 +193,7 @@ public class MaFenetre extends JFrame {
 //        pMap.revalidate();
 //        pMap.repaint();
         
-        pPrincipal.add(pMap, BorderLayout.PAGE_END);
+        pPrincipal.add(pMap,BorderLayout.CENTER);
         
         //PARTIE EST 
         
@@ -196,10 +202,28 @@ public class MaFenetre extends JFrame {
         JLabel titre_un = new JLabel("Véhicules");
         JLabel titre_deux = new JLabel("Centres de santé");
         
+        modeleV = new DefaultListModel();
+        modeleV.addElement("Véhicule 1");
+        modeleV.addElement("Véhicule 2");
+        JList liste = new JList<>(modeleV);
+        
         gbc.gridx = 0; gbc.gridy = 0;
         pEst.add(titre_un, gbc);
-                       gbc.gridy = 2;
+                       gbc.gridy = 1;
+                       
+                      
+        pEst.add(liste, gbc);
         pEst.add(titre_deux, gbc);
+        
+        modeleC = new DefaultListModel();
+        for(Node n : grapheActuel.getEachNode()){
+            modeleC.addElement("Centre" + n);
+        }
+        
+        JList listeC = new JList<>(modeleC);
+        
+        pEst.add(listeC, gbc);
+        pEst.setLayout(new GridLayout(10, 10, 10, 10));
         pPrincipal.add(pEst, BorderLayout.EAST);
         
         this.pack();

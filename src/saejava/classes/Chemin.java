@@ -180,43 +180,43 @@ public class Chemin {
 //    private ArrayList<Node> centresTraverses;
     //Visualisation des chemins : 
     
-    public void visualisationChemin(String typeChemin) {
-        if (typeChemin.equals("dureeMin")) {
-            for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
-            }
-            centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeEstimee);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
-        }
-        else if (typeChemin.equals("dureeEstimee")) {
-            for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
-            }
-            centresTraverses.get(1).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px;");
-        }
-    }
+    //public void visualisationChemin(String typeChemin) {
+        //if (typeChemin.equals("dureeMin")) {
+           // for (Edge e : routesTraversees) {
+             //   e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+           // }
+           // centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeEstimee);
+          //  centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
+      //  }
+       // else if (typeChemin.equals("dureeEstimee")) {
+       //     for (Edge e : routesTraversees) {
+       //         e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+       //     }
+        //    centresTraverses.get(1).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
+        //    centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px;");
+       // }
+   // }
     
-    public void visualisationTournee(int nbVehicule) {
-        if (nbVehicule == 1) {
-            for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
-            }
-            centresTraverses.get(0).addAttribute("ui.label", "Durée :" + this.dureeTotale);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
-        }
-        else if (nbVehicule == 2)
-                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
-        else {
+   // public void visualisationTournee(int nbVehicule) {
+       // if (nbVehicule == 1) {
+         //   for (Edge e : routesTraversees) {
+         //       e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+          //  }
+          //  centresTraverses.get(0).addAttribute("ui.label", "Durée :" + this.dureeTotale);
+          //  centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
+      //  }
+      //  else if (nbVehicule == 2)
+       //         e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+       // else {
             //Faire une fenetre d'info pour dire qu'il n'y a pas assez de vehicules
-            }
+         //   }
     
-            centresTraverses.get(0).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px;");
-        }
+         //  centresTraverses.get(0).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
+          //  centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px;");
+      //  }
 
 
     }
     
     
-}
+
