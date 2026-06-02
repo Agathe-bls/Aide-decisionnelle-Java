@@ -228,6 +228,8 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
         }
     }
     
+    //Si j'ai le temps Je fais le connexité
+    
     
 //    private void verifierCentresSeuls(){
 //        for(Node n : this){

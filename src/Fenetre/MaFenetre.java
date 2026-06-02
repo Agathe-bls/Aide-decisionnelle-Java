@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
@@ -177,11 +178,12 @@ public class MaFenetre extends JFrame {
         
         //MAP
         pMap = new JPanel(new BorderLayout());
-        pMap.setPreferredSize(new Dimension(500,500));
+        pMap.setPreferredSize(new Dimension(500,600));
         grapheActuel.visualisationGraphe();
         Viewer viewer = new Viewer(grapheActuel, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
-        viewer.enableAutoLayout(); // Disposition automatique
-        View view = viewer.addDefaultView(false);
+        viewer.enableAutoLayout();// affichage automatique
+       
+        DefaultView view=(DefaultView) viewer.addDefaultView(false);
         
         pMap.add((Component) view, BorderLayout.CENTER);
 //        pMap.revalidate();
