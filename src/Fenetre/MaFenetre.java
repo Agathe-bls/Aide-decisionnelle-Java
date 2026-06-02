@@ -91,6 +91,11 @@ public class MaFenetre extends JFrame {
     private JLabel id_m;
     private JLabel id_bo;
     
+    //Est 
+    
+    private JLabel titre_un;
+    private JLabel titre_deux;
+    
     public MaFenetre(){
         super("MedicOne");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -184,6 +189,19 @@ public class MaFenetre extends JFrame {
         
         pPrincipal.add(pMap, BorderLayout.PAGE_END);
         
+        //PARTIE EST 
+        
+        JPanel pEst = new JPanel(new GridBagLayout());
+        
+        JLabel titre_un = new JLabel("Véhicules");
+        JLabel titre_deux = new JLabel("Centres de santé");
+        
+        gbc.gridx = 0; gbc.gridy = 0;
+        pEst.add(titre_un, gbc);
+                       gbc.gridy = 2;
+        pEst.add(titre_deux, gbc);
+        pPrincipal.add(pEst, BorderLayout.EAST);
+        
         this.pack();
         this.setContentPane(pPrincipal);
     }
@@ -211,7 +229,6 @@ public class MaFenetre extends JFrame {
                 break;
 
             case 2:
-                //Je ne sais pas si c'est possible sinon on enlève le bouton annuler
                 break;
                 
             default:
@@ -248,57 +265,25 @@ public class MaFenetre extends JFrame {
     }
     
     private void popup_nouv_t(){
-        JDialog popup = new JDialog(this, "Nouveau Trajet", true);
-        JLabel centre_d = new JLabel("Centre de départ : ", JLabel.CENTER);
-        JButton ce_d = new JButton("Choisir");
+         String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
+        int choix = JOptionPane.showOptionDialog(this, "Quel type de trajet voulez-vous ?", "Choix du trajet", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
         
-        JLabel centre_a = new JLabel("Centre d'arrivé : ", JLabel.CENTER);
-        JButton ce_a = new JButton("Choisir");
-        
-        JLabel trajet_c = new JLabel("Trajet choisi", JLabel.CENTER);
-        
-        JButton envoyer = new JButton("Envoyer");
-        JButton annuler = new JButton("Annuler");
-        
-        monModele = new DefaultListModel();
-        monModele.addElement("Trajet 1");
-        monModele.addElement("Trajet 2");
-        monModele.addElement("Trajet 3");
-        JList liste_t = new JList<>(monModele);
-        
-        JPanel pan = new JPanel(new GridBagLayout());
-        
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        
-        JPanel pnlBoutons = new JPanel(new GridLayout(1, 2, 15, 0));
-        pnlBoutons.setOpaque(false); // Pour garder le même fond
-        pnlBoutons.add(envoyer);
-        pnlBoutons.add(annuler);
-    
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2; 
-        pan.add(centre_d, gbc);
-        gbc.gridy = 1;
-        pan.add(ce_d, gbc);
-        gbc.gridy = 2;
-        pan.add(centre_a, gbc);
-        gbc.gridy = 3;
-        pan.add(ce_a, gbc);
-        gbc.gridy = 4;
-        pan.add(trajet_c, gbc);
-        gbc.gridy = 5;
-        pan.add(liste_t, gbc);
-        gbc.gridy = 6;
-        gbc.fill = GridBagConstraints.HORIZONTAL; 
-        gbc.weightx = 1.0;                        
-        pan.add(pnlBoutons, gbc);
-        
-        popup.setContentPane(pan);
-        popup.pack(); 
-        popup.setLocationRelativeTo(this); 
-        popup.setVisible(true); 
+        switch (choix) {
+            case 0:
+                
+                break;
+
+            case 1:
+                
+                break;
+
+            case 2:
+               
+                break;
+                
+            default:
+                throw new IllegalStateException("Unexpected value: " + choix);
+        }
     }
     
     
