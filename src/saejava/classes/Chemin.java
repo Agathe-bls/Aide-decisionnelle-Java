@@ -25,10 +25,11 @@ public class Chemin {
     }
     
     public String getCentresTraverses(){
-        String resultat = "Chemin pris : ";
+        String resultat = "";
         for(Node n : centresTraverses){
-            resultat += n.getId() + " > ";
+            resultat = n.getId() + " > " + resultat;
         }
+        resultat = "Chemin pris : " + resultat;
         return resultat;
     }
 
@@ -50,47 +51,6 @@ public class Chemin {
         this.routesTraversees = new ArrayList<>();
     }
     //NORMALEMENT IL Y A PAS DE PROBLEME MAIS IL FAUT PEUT ETRE METTRE UNE EXCEPTION POUR ETRE SUR QUE DEPART/GRAPH/ARRIVEE VIENNENT BIEN DU MËME GRAPHE
-
-    //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
-    public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
-        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
-
-        //regarder pour chaque centre non traité un par un en prenant celui avec la plus petite durée Estimée si en le rajoutant aux chemin il permet de diminuer sa durée Estimée
-        while (!finTraitement(infosTableauDijkstra)) {
-            Node nTraite = centreAValeurMin(infosTableauDijkstra);
-            double EstimationActuel = (infosTableauDijkstra.get(nTraite).coutCalcule);
-
-            Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
-            while (itVoisins.hasNext()) {
-                Node voisin = itVoisins.next();
-                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double)voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
-                    double EstimationAvecVoisin = EstimationActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree")) * (20 - (double) (voisin.getEdgeBetween(nTraite).getAttribute("fiabilite"))) / 10;
-                    if (EstimationAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
-                        infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
-                        infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
-                    }
-                }
-            }
-            infosTableauDijkstra.get(nTraite).estTraite = true;
-        }
-        //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
-        Node debut = arrivee;
-        this.dureeEstimee = (infosTableauDijkstra.get(debut).coutCalcule);
-        while (debut != depart) {
-            Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
-            this.centresTraverses.add(debut);
-            this.routesTraversees.add(entreDeux);
-            this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
-            this.dureeTotale += (Integer) (entreDeux.getAttribute("duree"));
-            this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
-
-            debut = (infosTableauDijkstra.get(debut).centrePrecedent);
-        }
-        this.fiabiliteTotale = this.fiabiliteTotale / (this.centresTraverses.size() - 1);
-        this.centresTraverses.add(depart);
-
-        return this;
-    }
 
     public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
@@ -127,6 +87,47 @@ public class Chemin {
 
             debut = (infosTableauDijkstra.get(debut).centrePrecedent);
         }
+        this.centresTraverses.add(depart);
+
+        return this;
+    }
+    
+    //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
+    public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
+        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
+
+        //regarder pour chaque centre non traité un par un en prenant celui avec la plus petite durée Estimée si en le rajoutant aux chemin il permet de diminuer sa durée Estimée
+        while (!finTraitement(infosTableauDijkstra)) {
+            Node nTraite = centreAValeurMin(infosTableauDijkstra);
+            double EstimationActuel = (infosTableauDijkstra.get(nTraite).coutCalcule);
+
+            Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
+            while (itVoisins.hasNext()) {
+                Node voisin = itVoisins.next();
+                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double)voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
+                    double EstimationAvecVoisin = EstimationActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree")) * (20 - (double) (voisin.getEdgeBetween(nTraite).getAttribute("fiabilite"))) / 10;
+                    if (EstimationAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
+                        infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
+                        infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
+                    }
+                }
+            }
+            infosTableauDijkstra.get(nTraite).estTraite = true;
+        }
+        //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
+        Node debut = arrivee;
+        this.dureeEstimee = (infosTableauDijkstra.get(debut).coutCalcule);
+        while (debut != depart) {
+            Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
+            this.centresTraverses.add(debut);
+            this.routesTraversees.add(entreDeux);
+            this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
+            this.dureeTotale += (Integer) (entreDeux.getAttribute("duree"));
+            this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
+
+            debut = (infosTableauDijkstra.get(debut).centrePrecedent);
+        }
+        this.fiabiliteTotale = this.fiabiliteTotale / (this.centresTraverses.size() - 1);
         this.centresTraverses.add(depart);
 
         return this;
@@ -215,8 +216,6 @@ public class Chemin {
                     e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
                 }
                 break;
-
-
             default: //Faire une fenetre d'info pour dire qu'il n'y a pas assez de vehicules
                 break;
         }
@@ -230,4 +229,3 @@ public class Chemin {
         }
     }
 }
-

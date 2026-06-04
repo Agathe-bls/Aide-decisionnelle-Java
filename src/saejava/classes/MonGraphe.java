@@ -2,7 +2,6 @@ package saejava.classes;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import java.util.Scanner;
 
@@ -13,12 +12,18 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import java.util.random.RandomGenerator;
 
-import java.util.Iterator;
 
-public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGLEGRAPH FAUDRA QUE JE VOUS EN PARLE
+public class MonGraphe extends SingleGraph{
+    
+    private boolean estVide;
     
      public MonGraphe(String id_graphe) {
         super(id_graphe);
+        estVide = true;
+    }
+
+    public boolean getEstVide() {
+        return estVide;
     }
     
     public String getTypeComplet(Node centre){
@@ -35,15 +40,12 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
         return res;
     }
      
-     
 //Import des graphes des fichiers    
     private static ArrayList<String> lireCSV(String nomFichier) {
         ArrayList<String> lignes = new ArrayList<>();
-        System.out.println(nomFichier);
         try {
             FileInputStream file = new FileInputStream(nomFichier);
             Scanner scanner = new Scanner(file);
-            
 
             while (scanner.hasNext()) {
                 String ligne = scanner.nextLine();
@@ -93,13 +95,14 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
         ArrayList<String> lignes = lireCSV(nomFichier);
         creerCentres(lignes);
         creerRoutes(lignes);
+        this.estVide = false;
     }
     
     
 //Création du graphe aléatoire
 
-    public Graph creerGrapheAleatoire(int N){        
-        for (int i=0; i<N; i++){
+    public void creerGrapheAleatoire(int N){        
+        for (int i=1; i<=N; i++){
             Node n = this.addNode("S"+i);
             n.addAttribute("type", choisirTypeCAlea());
         }
@@ -110,7 +113,7 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
         
         verifierCentresSeuls();
         
-        return this;
+        this.estVide = false;
     }
     
     private String choisirTypeCAlea(){
@@ -131,7 +134,7 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
                 if(n != nV){
                     if(!n.hasEdgeBetween(nV)){
                         Edge e = this.addEdge(nV.getId()+ "/" +n.getId(), nV, n);
-                        e.addAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(2,10.1)/10);
+                        e.addAttribute("fiabilite", RandomGenerator.getDefault().nextInt(2,11)/10.0);
                         e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10,51));
                         e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10,121));
                     }
@@ -156,20 +159,20 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
         //et graphe non connexe donc je fais une liaison entre chaque centre mais est ce que ducoup c'est vraiment aléatoire ?
         //AVEC FIABILITE plus grande que 0.25 pour pas faire beuguer pour le plus cours chemin !!!
         for (int i = 1; i < this.getNodeCount(); i++) {
-            Node precedent = this.getNode("S" + (i - 1));
-            Node actuel = this.getNode("S" + i);
+            Node precedent = this.getNode("S" + i);
+            Node actuel = this.getNode("S" + (i+1));
 
             if (!actuel.hasEdgeBetween(precedent)) {
                 Edge e = this.addEdge(precedent.getId() + "/" + actuel.getId(), precedent, actuel);
 
-                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(3, 10.1) / 10);
+                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextInt(3, 11) / 10.0);
                 e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10, 51));
                 e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10, 121));
             }
             if ((double)(actuel.getEdgeBetween(precedent).getAttribute("fiabilite")) < 0.25){
                 Edge e = actuel.getEdgeBetween(precedent);
                 
-                e.setAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(3, 10.1) / 10);
+                e.setAttribute("fiabilite", RandomGenerator.getDefault().nextInt(3, 11) / 10.0);
             }
         }
     }
@@ -179,8 +182,6 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
      * les 5 premiers points je mets forcement le truc
      * le reste je regarde les proba
      */
-    
-    
     
     
 //    private void verifierCentresSeuls(){
@@ -193,30 +194,38 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
 //                Node nAlea = this.getNode(randomIdCentre);
 //                Edge e = this.addEdge(nAlea.getId()+ "/" +n.getId(), nAlea, n);
 //                
-//                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextDouble(2,10.1)/10);
+//                e.addAttribute("fiabilite", RandomGenerator.getDefault().nextInt(2,11)/10.0);
 //                e.addAttribute("distance", RandomGenerator.getDefault().nextInt(10,51));
 //                e.addAttribute("duree", RandomGenerator.getDefault().nextInt(10,121));
-//                
 //            }
-//                
 //        }
 //    }
     
     
-     public void visualisationGraphe() {
-         for(Node n : this.getNodeSet()){
-             if (n.getAttribute("type").equals("M")) {
-                 n.addAttribute("ui.label", "(" + n.getId() + "," + n.getAttribute("type") + ")");
-                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
-             } else if (n.getAttribute("type").equals("O")) {
-                 n.addAttribute("ui.label", "(" + n.getId() + "," + n.getAttribute("type") + ")");
-                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #8FB6FA;");
-             } else if (n.getAttribute("type").equals("N")) {
-                 n.addAttribute("ui.label", "(" + n.getId() + "," + n.getAttribute("type") + ")");
-                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #93FA8F;");
-             } else {
-                 throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
-             }
-         }
-     }
+    public void visualisationGraphe() {
+        for (Node n : this.getNodeSet()) {
+            n.setAttribute("ui.style", "size : 20;");
+            if (n.getAttribute("type").equals("M")) {
+                n.addAttribute("ui.label", n.getId());
+                n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
+            } else if (n.getAttribute("type").equals("O")) {
+                n.addAttribute("ui.label", n.getId());
+                n.addAttribute("ui.style", "text-size: 20px; fill-color: #8FB6FA;");
+            } else if (n.getAttribute("type").equals("N")) {
+                n.addAttribute("ui.label", n.getId());
+                n.addAttribute("ui.style", "text-size: 20px; fill-color: #93FA8F;");
+            } else {
+                throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+            }
+        }
+    }
+    
+    public void visualisationRoutes(){ // 0 = fiabilité  / 1 = duree / 2 = distance
+        for(Edge e : this.getEachEdge()){
+            e.addAttribute("ui.label", e.getAttribute("fiabilite"));
+            e.addAttribute("ui.style", "text-size: 20px;");
+        }
+    }
+     
+     
 }
