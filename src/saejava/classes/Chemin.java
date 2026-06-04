@@ -197,7 +197,7 @@ public class Chemin {
        // }
    // }
     
-//HEAD
+
    // public void visualisationTournee(int nbVehicule) {
        // if (nbVehicule == 1) {
          //   for (Edge e : routesTraversees) {
