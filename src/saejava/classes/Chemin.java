@@ -46,10 +46,10 @@ public class Chemin {
     public String getCentresTraverses() {
         String resultat = "";
         for (Node n : centresTraverses) {
-            if (centresTraverses.get(0) == n){
+            if (centresTraverses.get(0) == n)
                 resultat = n.getId();
-            }
-            resultat = n.getId() + " > " + resultat;
+            else 
+                resultat = n.getId() + " > " + resultat;
         }
         resultat = "Chemin pris : " + resultat;
         return resultat;
@@ -200,7 +200,7 @@ public class Chemin {
             }
         } else if (typeChemin.equals("dureeEstimee")) {
             for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px; shape : cubic-curve; arrow-shape : arrow;");
             }
         }
     }

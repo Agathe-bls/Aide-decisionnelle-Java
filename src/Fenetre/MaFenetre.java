@@ -13,10 +13,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JSpinner;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -26,6 +26,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
@@ -82,6 +84,7 @@ public class MaFenetre extends JFrame {
     private JCheckBoxMenuItem checkFia;
     private JCheckBoxMenuItem checkDuree;
     private JCheckBoxMenuItem checkDistance;
+    private JSpinner seuil_test;
     
     //popup info centre
     private JLabel titre_ic;
@@ -97,48 +100,11 @@ public class MaFenetre extends JFrame {
         créationMenu();
         initComposants();
         initEcouteurs();
-        testGraphNonPresent();
-        
+        testGraphPresent();
+        visuSeuil();
         gererTailleTextes();
         
         this.setVisible(true);
-    }
-    
-    private void gererTailleTextes(){
-        Font police = new Font("Arial", Font.ROMAN_BASELINE, 16);
-        Font policeTitre = new Font("Arial", Font.BOLD, 17);
-        //Partie Haut Nouvelle-map
-        nom_m.setFont(policeTitre);
-        btNouvelle_map.setFont(police);
-        //Partie Haut Véhicules
-        vehicule.setFont(policeTitre);
-        intervention.setFont(police);
-        //Partie Haut Centres
-        type_centre.setFont(policeTitre);
-        nutrition.setFont(police);
-        nbr_n.setFont(police);
-        couleur_n.setFont(police);
-        maternite.setFont(police);
-        nbr_m.setFont(police);
-        couleur_m.setFont(police);
-        bloc_operatoire.setFont(police);
-        nbr_bo.setFont(police);
-        couleur_bo.setFont(police);
-        //Partie Haut Nouveau trajets
-         btNouveau_trajet.setFont(police);
-         //Map
-         coutEtTrajet.setFont(police);
-         //Partie Est 
-        titreComboC.setFont(policeTitre);
-        //Menu
-        menuCentres.setFont(policeTitre);
-        menuRoutes.setFont(policeTitre);
-        menuSeuil.setFont(policeTitre);
-        checkType.setFont(police);
-        checkNom.setFont(police);
-        checkFia.setFont(police);
-        checkDuree.setFont(police);
-        checkDistance.setFont(police);
     }
     
     private void créationMenu(){
@@ -151,10 +117,14 @@ public class MaFenetre extends JFrame {
         //                                  menuSeuil.addSeparator(); CA NE MARCHE PAS JSP POURQUOI
         
         checkNom = new JCheckBoxMenuItem("Noms des centres");
+        checkNom.setSelected(true);
         checkType = new JCheckBoxMenuItem("Types des centres");
         checkFia = new JCheckBoxMenuItem("Fiabilités");
         checkDuree = new JCheckBoxMenuItem("Durées");
         checkDistance = new JCheckBoxMenuItem("Distances");
+        seuil_test = new JSpinner(new SpinnerNumberModel(1,0,1,0.1));
+        seuil_test.setPreferredSize(new Dimension(173,20));
+        
         
         menuCentres.add(checkNom);
         menuCentres.add(checkType);
@@ -162,6 +132,8 @@ public class MaFenetre extends JFrame {
         menuRoutes.add(checkFia);
         menuRoutes.add(checkDuree);
         menuRoutes.add(checkDistance);
+        
+        menuSeuil.add(seuil_test);
         
         menuBar.add(menuCentres);
         menuBar.add(menuRoutes);
@@ -288,36 +260,6 @@ public class MaFenetre extends JFrame {
         this.pack();
         this.setContentPane(pPrincipal);
     }
-    
-    private JPanel InfosCouleursCentres(int type){
-        JPanel couleur = new JPanel();
-        switch(type){
-            case 0 : couleur.setBackground(Color.decode("#93FA8F")); break;
-            case 1 : couleur.setBackground(Color.decode("#FA8FF1")); break;
-            case 2 : couleur.setBackground(Color.decode("#8FB6FA")); break;
-        }
-        couleur.setPreferredSize(new Dimension(15,15));
-        couleur.setVisible(true);
-        couleur.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        return couleur;
-    }
-    
-    private void testGraphNonPresent() {
-        if (grapheActuel.getEstVide() == true) {
-            System.out.println("initialisation a FAUX");
-            btNouveau_trajet.setEnabled(false);
-            checkFia.setEnabled(false);
-            checkDuree.setEnabled(false);
-            checkDistance.setEnabled(false);
-        } else {
-            System.out.println("initialisation a VRAI");
-            btNouveau_trajet.setEnabled(true);
-            checkFia.setEnabled(true);
-            checkDuree.setEnabled(true);
-            checkDistance.setEnabled(true);
-        }
-        System.out.println("le graphe est vide : " + grapheActuel.getEstVide());
-    }
      
     private void initEcouteurs() {
         //Partie Haut
@@ -333,68 +275,24 @@ public class MaFenetre extends JFrame {
 
         //Menu
         checkFia.addActionListener((ActionEvent e) -> {
-            initLabelRoutes();
+            labelCheckRoutes();
         });
         checkDuree.addActionListener((ActionEvent e) -> {
-            initLabelRoutes();
+            labelCheckRoutes();
         });
         checkDistance.addActionListener((ActionEvent e) -> {
-            initLabelRoutes();
+            labelCheckRoutes();
         });
+        
+        checkNom.addActionListener((ActionEvent e) -> {
+            labelCheckCentres();
+        });
+        
+        checkType.addActionListener((ActionEvent e) -> {
+            labelCheckCentres();
+        });
+        
 
-    }
-    
-    private void initLabelRoutes(){
-        for (Edge route : grapheActuel.getEachEdge()) {
-            String label = "";
-
-            if (checkFia.isSelected()) {
-                label += route.getAttribute("fiabilite") + " fia";
-            }
-
-            if (checkDuree.isSelected()) {
-                if (!label.equals("")) {
-                    label += " | ";
-                }
-                label += route.getAttribute("duree") + " min";
-            }
-
-            if (checkDistance.isSelected()) {
-                if (!label.equals("")) {
-                    label += " | ";
-                }
-                label += route.getAttribute("distance") + " km";
-            }
-
-            if (label.equals("")) {
-                route.removeAttribute("ui.label");
-            } else {
-                route.addAttribute("ui.label", label);
-            }
-
-            route.addAttribute("ui.style", "text-size: 15; text-alignment : along;");
-        }
-    }
-    
-    private void recharger_infos(){
-        coutEtTrajet.setText("");
-        pMap.revalidate();
-        pMap.repaint();
-        grapheActuel.visualisationGraphe();
-        int nu = 0, m = 0, o = 0;
-        for(Node n : grapheActuel.getEachNode()){
-            if(n.getAttribute("type").equals("N"))
-                nu ++;
-            else if(n.getAttribute("type").equals("M"))
-                m++;
-            else if(n.getAttribute("type").equals("O"))
-                o++;
-            else
-                throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
-        }
-        nbr_bo.setText("" + o);
-        nbr_m.setText("" + m);
-        nbr_n.setText("" +  nu); 
     }
     
     private void popup_nouv_district() throws IOException{
@@ -411,7 +309,6 @@ public class MaFenetre extends JFrame {
                     
                     grapheActuel.clear();
                     grapheActuel.chargerGraphe(fichier);
-                    recharger_infos();
                     nom_m.setText("District du fichier " + fichier);
                 }
                 //else //BIEN METTRE UNE EXCEPTION
@@ -421,8 +318,7 @@ public class MaFenetre extends JFrame {
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 grapheActuel.clear();
                 grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
-                recharger_infos();
-                nom_m.setText("District aléatoire de " + grapheActuel.getNodeCount() + " centres");
+                nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 break;
 
             case 2:
@@ -431,7 +327,8 @@ public class MaFenetre extends JFrame {
             default:
                 throw new IllegalStateException("Unexpected value: " + choix);
         }
-        testGraphNonPresent();
+        recharger_infos();
+        testGraphPresent();
     }
     
     private void popup_nouv_t(){
@@ -516,5 +413,161 @@ public class MaFenetre extends JFrame {
         popup.pack(); 
         popup.setLocationRelativeTo(this); 
         popup.setVisible(true);
+    }
+    
+    private void recharger_infos(){
+        coutEtTrajet.setText("");
+        grapheActuel.visualisationGraphe();
+        nbCentresParType();
+        seuil_test.setValue(1.0);
+    }
+    
+    private void nbCentresParType(){
+        int nu = 0, m = 0, o = 0;
+        for(Node n : grapheActuel.getEachNode()){
+            if(n.getAttribute("type").equals("N"))
+                nu ++;
+            else if(n.getAttribute("type").equals("M"))
+                m++;
+            else if(n.getAttribute("type").equals("O"))
+                o++;
+            else
+                throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+        }
+        nbr_bo.setText("" + o);
+        nbr_m.setText("" + m);
+        nbr_n.setText("" +  nu); 
+    }
+    
+    private void testGraphPresent() {
+        if (grapheActuel.getEstVide() == true) {
+            btNouveau_trajet.setEnabled(false);
+            checkFia.setEnabled(false);
+            checkDuree.setEnabled(false);
+            checkDistance.setEnabled(false);
+            checkNom.setEnabled(false);
+            checkType.setEnabled(false);
+            seuil_test.setEnabled(false);
+        } else {
+            btNouveau_trajet.setEnabled(true);
+            checkFia.setEnabled(true);
+            checkDuree.setEnabled(true);
+            checkDistance.setEnabled(true);
+            checkNom.setEnabled(true);
+            checkType.setEnabled(true);
+            seuil_test.setEnabled(true);
+        }
+    }
+    
+    private void labelCheckRoutes(){
+        for (Edge route : grapheActuel.getEachEdge()) {
+            String label = "";
+
+            if (checkFia.isSelected()) {
+                label += route.getAttribute("fiabilite") + " fia";
+            }
+
+            if (checkDuree.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("duree") + " min";
+            }
+
+            if (checkDistance.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("distance") + " km";
+            }
+
+            if (label.equals("")) {
+                route.removeAttribute("ui.label");
+            } else {
+                route.addAttribute("ui.label", label);
+            }
+            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
+        }
+    }
+    
+    private void labelCheckCentres(){
+        for(Node centre : grapheActuel.getEachNode()){
+            String label = "";
+            
+            if(checkNom.isSelected()){
+                label = centre.getId() + label;
+            }
+            if(checkType.isSelected()){
+                if(!label.equals("")){
+                    label += " | ";
+                }
+                label += grapheActuel.getTypeComplet(centre);
+            }
+            centre.addAttribute("ui.label", label);
+        }
+    }
+    
+    private void visuSeuil() {
+        seuil_test.addChangeListener((ChangeEvent e) -> {
+            for (Edge route : grapheActuel.getEachEdge()) {
+                if (((double) route.getAttribute("fiabilite")) > ((double)seuil_test.getValue())) {
+                    
+                    route.addAttribute("ui.label", " ⚠ ");
+                    route.addAttribute("ui.style", "text-size: 25; icon: dyn-icon; icon-mode: at-left; ");
+                    route.addAttribute("ui.icon", "attention.jpg");
+                }
+            }
+        });
+    }
+    
+    private JPanel InfosCouleursCentres(int type){
+        JPanel couleur = new JPanel();
+        switch(type){
+            case 0 : couleur.setBackground(Color.decode("#93FA8F")); break;
+            case 1 : couleur.setBackground(Color.decode("#FA8FF1")); break;
+            case 2 : couleur.setBackground(Color.decode("#8FB6FA")); break;
+        }
+        couleur.setPreferredSize(new Dimension(15,15));
+        couleur.setVisible(true);
+        couleur.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        return couleur;
+    }
+    
+    private void gererTailleTextes(){
+        Font police = new Font("Arial", Font.ROMAN_BASELINE, 16);
+        Font policeTitre = new Font("Arial", Font.BOLD, 17);
+        //Partie Haut Nouvelle-map
+        nom_m.setFont(policeTitre);
+        btNouvelle_map.setFont(police);
+        //Partie Haut Véhicules
+        vehicule.setFont(policeTitre);
+        intervention.setFont(police);
+        //Partie Haut Centres
+        type_centre.setFont(policeTitre);
+        nutrition.setFont(police);
+        nbr_n.setFont(police);
+        couleur_n.setFont(police);
+        maternite.setFont(police);
+        nbr_m.setFont(police);
+        couleur_m.setFont(police);
+        bloc_operatoire.setFont(police);
+        nbr_bo.setFont(police);
+        couleur_bo.setFont(police);
+        //Partie Haut Nouveau trajets
+         btNouveau_trajet.setFont(police);
+         //Map
+         coutEtTrajet.setFont(police);
+         //Partie Est 
+        titreComboC.setFont(policeTitre);
+        //Menu
+        menuCentres.setFont(policeTitre);
+        menuRoutes.setFont(policeTitre);
+        menuSeuil.setFont(policeTitre);
+        checkType.setFont(police);
+        checkNom.setFont(police);
+        checkFia.setFont(police);
+        checkDuree.setFont(police);
+        checkDistance.setFont(police);
+        seuil_test.setFont(police);
     }
 }
