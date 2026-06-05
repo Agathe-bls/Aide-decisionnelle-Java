@@ -40,7 +40,7 @@ public class MonGraphe extends SingleGraph{
         return res;
     }
      
-//Import des graphes des fichiers    
+    //Import des graphes des fichiers    
     private static ArrayList<String> lireCSV(String nomFichier) {
         ArrayList<String> lignes = new ArrayList<>();
         try {
@@ -54,16 +54,13 @@ public class MonGraphe extends SingleGraph{
                 }
             }
             scanner.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch(Exception e) {
-            e.printStackTrace() ;
-        }
-        
         return lignes;
     }
     
     private void creerCentres(ArrayList<String> lignes) {
-
         for (int i = 0; i < lignes.size(); i++) {
             String[] ligne = lignes.get(i).split(";");
             

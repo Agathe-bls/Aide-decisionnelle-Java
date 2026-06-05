@@ -6,50 +6,30 @@ package Fenetre;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import static java.awt.Color.BLACK;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.swingViewer.DefaultView;
-import org.graphstream.ui.view.Viewer;
-import org.graphstream.graph.Node;
-import org.graphstream.ui.swingViewer.DefaultView;
-import org.graphstream.ui.swingViewer.ViewPanel;
-import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 import saejava.classes.Chemin;
 import saejava.classes.MonGraphe;
@@ -58,7 +38,6 @@ import saejava.classes.MonGraphe;
  * @author Auryann / Agathe
  */
 public class MaFenetre extends JFrame {
-    MonGraphe grapheActuel = new MonGraphe("gActuel");
     
     //Partie Haut Nouvelle-map
     private JLabel nom_m;
@@ -85,9 +64,10 @@ public class MaFenetre extends JFrame {
     private JButton btNouveau_trajet;
     
     //Map
+    private MonGraphe grapheActuel = new MonGraphe("gActuel");
     private JPanel pMap;
-    Chemin chemin = new Chemin(grapheActuel);
-    JLabel coutEtTrajet;
+    private Chemin chemin = new Chemin(grapheActuel);
+    private JLabel coutEtTrajet;
     
     //Partie Est 
     private JLabel titreComboC;
@@ -116,8 +96,9 @@ public class MaFenetre extends JFrame {
         
         créationMenu();
         initComposants();
-        testGraphPresent();
-       
+        initEcouteurs();
+        testGraphNonPresent();
+        
         gererTailleTextes();
         
         this.setVisible(true);
@@ -168,7 +149,7 @@ public class MaFenetre extends JFrame {
         menuRoutes = new JMenu("Informations des routes");
         menuSeuil = new JMenu("Seuil de dangerosité");
         //                                  menuSeuil.addSeparator(); CA NE MARCHE PAS JSP POURQUOI
-                
+        
         checkNom = new JCheckBoxMenuItem("Noms des centres");
         checkType = new JCheckBoxMenuItem("Types des centres");
         checkFia = new JCheckBoxMenuItem("Fiabilités");
@@ -321,48 +302,46 @@ public class MaFenetre extends JFrame {
         return couleur;
     }
     
-    private void testGraphPresent(){
-        if(grapheActuel.getEstVide() == true){
-            initEcouteurs(false);
+    private void testGraphNonPresent() {
+        if (grapheActuel.getEstVide() == true) {
+            System.out.println("initialisation a FAUX");
+            btNouveau_trajet.setEnabled(false);
+            checkFia.setEnabled(false);
+            checkDuree.setEnabled(false);
+            checkDistance.setEnabled(false);
+        } else {
+            System.out.println("initialisation a VRAI");
+            btNouveau_trajet.setEnabled(true);
+            checkFia.setEnabled(true);
+            checkDuree.setEnabled(true);
+            checkDistance.setEnabled(true);
         }
-        else 
-            initEcouteurs(true);
         System.out.println("le graphe est vide : " + grapheActuel.getEstVide());
     }
-    
-    private void initEcouteurs(boolean graphPresent){
+     
+    private void initEcouteurs() {
         //Partie Haut
-        btNouvelle_map.addActionListener(e -> {
+        btNouvelle_map.addActionListener((ActionEvent e) -> {
             try {
                 popup_nouv_district();
             } catch (IOException ex) {
                 System.getLogger(MaFenetre.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
         });
-        if (graphPresent == true) {
-            btNouveau_trajet.setEnabled(true);
-            checkFia.setEnabled(true);
-            checkDuree.setEnabled(true);
-            checkDistance.setEnabled(true);
-            //Nouveau trajet 
-            btNouveau_trajet.addActionListener(e -> popup_nouv_t());
+        //Nouveau trajet 
+        btNouveau_trajet.addActionListener(e -> popup_nouv_t());
 
-            //Menu
-            checkFia.addActionListener((ActionEvent e) -> {
-                initLabelRoutes();
-            });
-            checkDuree.addActionListener((ActionEvent e) -> {
-                initLabelRoutes();
-            });
-            checkDistance.addActionListener((ActionEvent e) -> {
-                initLabelRoutes();
-            });
-        } else if (graphPresent == false) {
-            btNouveau_trajet.setEnabled(false);
-            checkFia.setEnabled(false);
-            checkDuree.setEnabled(false);
-            checkDistance.setEnabled(false);
-        }
+        //Menu
+        checkFia.addActionListener((ActionEvent e) -> {
+            initLabelRoutes();
+        });
+        checkDuree.addActionListener((ActionEvent e) -> {
+            initLabelRoutes();
+        });
+        checkDistance.addActionListener((ActionEvent e) -> {
+            initLabelRoutes();
+        });
+
     }
     
     private void initLabelRoutes(){
@@ -419,13 +398,8 @@ public class MaFenetre extends JFrame {
     }
     
     private void popup_nouv_district() throws IOException{
-        checkFia.setSelected(false);
-        checkDistance.setSelected(false);
-        checkDuree.setSelected(false);
-        
         String[] options = {"Import", "Création aléatoire", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Comment voulez vous créer votre nouveau district ?", "Choix du district", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        
         switch (choix) {
             case 0:
                 f = new JFileChooser();
@@ -457,7 +431,7 @@ public class MaFenetre extends JFrame {
             default:
                 throw new IllegalStateException("Unexpected value: " + choix);
         }
-        testGraphPresent();
+        testGraphNonPresent();
     }
     
     private void popup_nouv_t(){
@@ -541,9 +515,6 @@ public class MaFenetre extends JFrame {
         popup.setContentPane(pan);
         popup.pack(); 
         popup.setLocationRelativeTo(this); 
-        popup.setVisible(true); 
-        
+        popup.setVisible(true);
     }
-    
-    
 }

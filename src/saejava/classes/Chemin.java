@@ -16,23 +16,6 @@ import org.graphstream.graph.Node;
  */
 public class Chemin {
 
-    public int getDureeTotale() {
-        return dureeTotale;
-    }
-
-    public double getDureeEstimee() {
-        return dureeEstimee;
-    }
-    
-    public String getCentresTraverses(){
-        String resultat = "";
-        for(Node n : centresTraverses){
-            resultat = n.getId() + " > " + resultat;
-        }
-        resultat = "Chemin pris : " + resultat;
-        return resultat;
-    }
-
     private MonGraphe grapheAssocie;
 
     private double fiabiliteTotale;
@@ -51,6 +34,26 @@ public class Chemin {
         this.routesTraversees = new ArrayList<>();
     }
     //NORMALEMENT IL Y A PAS DE PROBLEME MAIS IL FAUT PEUT ETRE METTRE UNE EXCEPTION POUR ETRE SUR QUE DEPART/GRAPH/ARRIVEE VIENNENT BIEN DU MËME GRAPHE
+
+    public int getDureeTotale() {
+        return dureeTotale;
+    }
+
+    public double getDureeEstimee() {
+        return dureeEstimee;
+    }
+
+    public String getCentresTraverses() {
+        String resultat = "";
+        for (Node n : centresTraverses) {
+            if (centresTraverses.get(0) == n){
+                resultat = n.getId();
+            }
+            resultat = n.getId() + " > " + resultat;
+        }
+        resultat = "Chemin pris : " + resultat;
+        return resultat;
+    }
 
     public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
@@ -91,7 +94,7 @@ public class Chemin {
 
         return this;
     }
-    
+
     //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
     public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
@@ -104,7 +107,7 @@ public class Chemin {
             Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
             while (itVoisins.hasNext()) {
                 Node voisin = itVoisins.next();
-                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double)voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
+                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double) voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
                     double EstimationAvecVoisin = EstimationActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree")) * (20 - (double) (voisin.getEdgeBetween(nTraite).getAttribute("fiabilite"))) / 10;
                     if (EstimationAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
                         infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
@@ -188,16 +191,14 @@ public class Chemin {
         }
         return centreMin;
     }
-    
-    //Visualisation des chemins : 
 
+    //Visualisation des chemins : 
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
             for (Edge e : routesTraversees) {
                 e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
             }
-        }
-        else if (typeChemin.equals("dureeEstimee")) {
+        } else if (typeChemin.equals("dureeEstimee")) {
             for (Edge e : routesTraversees) {
                 e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
             }
@@ -220,12 +221,13 @@ public class Chemin {
                 break;
         }
     }
-    
-    public void clearVisualisations(){
+
+    public void clearVisualisations() {
         grapheAssocie.visualisationGraphe();
-        for(Edge e : routesTraversees){
-            if(e.hasAttribute("ui.style"))
+        for (Edge e : routesTraversees) {
+            if (e.hasAttribute("ui.style")) {
                 e.changeAttribute("ui.style", "fill-color: darck; size: 1px;");
+            }
         }
     }
 }
