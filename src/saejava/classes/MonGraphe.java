@@ -39,7 +39,7 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
 //Import des graphes des fichiers    
     private static ArrayList<String> lireCSV(String nomFichier) {
         ArrayList<String> lignes = new ArrayList<>();
-        
+        System.out.println(nomFichier);
         try {
             FileInputStream file = new FileInputStream(nomFichier);
             Scanner scanner = new Scanner(file);
@@ -175,6 +175,12 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
     }
     
     //Si j'ai le temps Je fais le connexité
+    /**
+     * les 5 premiers points je mets forcement le truc
+     * le reste je regarde les proba
+     */
+    
+    
     
     
 //    private void verifierCentresSeuls(){
@@ -200,13 +206,13 @@ public class MonGraphe extends SingleGraph{ //C'est PARCE QUE J'AI EXTENDS SINGL
      public void visualisationGraphe() {
          for(Node n : this.getNodeSet()){
              if (n.getAttribute("type").equals("M")) {
-                 n.addAttribute("ui.label", "" + n.getAttribute("type"));
+                 n.addAttribute("ui.label", "(" + n.getId() + "," + n.getAttribute("type") + ")");
                  n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
              } else if (n.getAttribute("type").equals("O")) {
-                 n.addAttribute("ui.label", "" + n.getAttribute("type"));
+                 n.addAttribute("ui.label", "(" + n.getId() + "," + n.getAttribute("type") + ")");
                  n.addAttribute("ui.style", "text-size: 20px; fill-color: #8FB6FA;");
              } else if (n.getAttribute("type").equals("N")) {
-                 n.addAttribute("ui.label", "" + n.getAttribute("type"));
+                 n.addAttribute("ui.label", "(" + n.getId() + "," + n.getAttribute("type") + ")");
                  n.addAttribute("ui.style", "text-size: 20px; fill-color: #93FA8F;");
              } else {
                  throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
