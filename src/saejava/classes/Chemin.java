@@ -35,12 +35,30 @@ public class Chemin {
     }
     //NORMALEMENT IL Y A PAS DE PROBLEME MAIS IL FAUT PEUT ETRE METTRE UNE EXCEPTION POUR ETRE SUR QUE DEPART/GRAPH/ARRIVEE VIENNENT BIEN DU MËME GRAPHE
 
+    public double getFiabiliteTotale() {
+        return fiabiliteTotale;
+    }
+    
+    public int getDistanceTotale() {
+        return distanceTotale;
+    }
+
     public int getDureeTotale() {
         return dureeTotale;
     }
 
     public double getDureeEstimee() {
         return dureeEstimee;
+    }
+
+    public ArrayList<Edge> getRoutesTraversees() {
+        return routesTraversees;
+    }
+
+    @Override
+    public String toString() {
+        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
+                + dureeEstimee + "]";
     }
 
     public String getCentresTraverses() {
@@ -204,19 +222,24 @@ public class Chemin {
             }
         }
     }
-
+    
     public void visualisationTournee(int nbVehicule) {
         switch (nbVehicule) {
             case 1:
                 for (Edge e : routesTraversees) {
                     e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
                 }
+                centresTraverses.get(0).addAttribute("ui.label", "" + centresTraverses.get(0).getId());
+                centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px; text-color: black;");
                 break;
             case 2:
                 for (Edge e : routesTraversees) {
                     e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
                 }
+                centresTraverses.get(0).addAttribute("ui.label", ""+centresTraverses.get(0).getId());
+                centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px;");
                 break;
+
             default: //Faire une fenetre d'info pour dire qu'il n'y a pas assez de vehicules
                 break;
         }
