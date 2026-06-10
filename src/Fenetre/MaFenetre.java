@@ -20,7 +20,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,16 +28,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
-import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
 import saejava.classes.MonGraphe;
 import saejava.classes.Chemin;
+import saejava.classes.Tournee;
 
 /**
  *
@@ -69,14 +67,18 @@ public class MaFenetre extends JFrame {
     private JLabel nbr_bo;
     private JPanel couleur_bo;
     
-    //Partie Haut Nouveau trajets
-    private JButton btNouveau_trajet;
-    
     //Map
     private MonGraphe grapheActuel = new MonGraphe("gActuel");
     private JPanel pMap;
+    
+    //Partie Haut Nouveau trajets
+    private JButton btNouveau_trajet;
+    
     private Chemin chemin = new Chemin(grapheActuel);
     private JLabel coutEtTrajet;
+    
+    private Tournee tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
+    private Tournee tournee2V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 2);
     
     //Partie Est 
     private JLabel titreComboC;
@@ -345,16 +347,12 @@ public class MaFenetre extends JFrame {
             }
         });
         
-       
-        
         view.addMouseListener(new MouseAdapter() {
         @Override
             public void mousePressed(MouseEvent e) {
                 popup_infos_centre();
             }
         });
-        
-        
    
         
         //Nouveau trajet 
@@ -456,9 +454,26 @@ public class MaFenetre extends JFrame {
                 
                 switch (NbV) {
                     case 1:
+                        String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
+                        int TypeCentres  = JOptionPane.showOptionDialog(this, "Quel type de centre voulez vous dans votre tournée?", "Choix du type des centres de la tournée", 0, JOptionPane.QUESTION_MESSAGE, null, choixTypeCentres, choixTypeCentres[3]) ;
+                        
+                        String type = null;
+                        switch(TypeCentres){
+                            case 0 : type = "N"; break;
+                            case 1 : type = "O"; break;
+                            case 2 : type = "M"; break;
+                            case 3 : type = null; break;
+                            default : type = null; break;
+                        }
+                        
+                        tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
+                        tournee1V.colorierTourneeUnVehicule(1);
                         System.out.println("On a pas encore cette possibilité");
                         break;
                     case 2:
+                        tournee2V.calculerTourneeDeuxVehicules();
+                        tournee2V.colorierTourneeUnVehicule(1);
+                        tournee2V.colorierTourneeUnVehicule(2);
                         System.out.println("On a pas encore cette possibilité");
                         break;
                     default:
@@ -473,7 +488,6 @@ public class MaFenetre extends JFrame {
                 //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT
         }
     }
-    
     
     
     private void recharger_infos(){

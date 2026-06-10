@@ -4,8 +4,6 @@
  */
 package saejava.classes;
 
-import static java.awt.Color.lightGray;
-
 import java.util.ArrayList;
 
 import org.graphstream.graph.Node;
@@ -89,7 +87,7 @@ public class Tournee {
         Node positionActuelle = lstVehicules.get(0).positionActuelle;
 
         lstVehicules.get(0).centresLivres.add(positionActuelle);
-        centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie...
+        centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie... //////////////////////////////////////////
 
         while(!centresPasLivres.isEmpty()) {
             Node centrePlusProche = trouverCentrePlusProche(centresPasLivres, positionActuelle);
