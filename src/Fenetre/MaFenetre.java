@@ -13,6 +13,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,19 +29,24 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
+import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
-import saejava.classes.Chemin;
 import saejava.classes.MonGraphe;
+import saejava.classes.Chemin;
+
 /**
  *
  * @author Auryann / Agathe
  */
 public class MaFenetre extends JFrame {
+    
+    private DefaultView view;
     
     //Partie Haut Nouvelle-map
     private JLabel nom_m;
@@ -89,6 +96,9 @@ public class MaFenetre extends JFrame {
     //popup info centre
     private JLabel titre_ic;
     private JLabel t_nom_ic;
+    
+    
+  
     
     public MaFenetre(){
         super("MedicOne");
@@ -232,16 +242,20 @@ public class MaFenetre extends JFrame {
         pMap.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         pMap.setPreferredSize(new Dimension(700,500));
         grapheActuel.visualisationGraphe();
-        Viewer viewer = new Viewer(grapheActuel, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        Viewer viewer = new Viewer(grapheActuel, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         viewer.enableAutoLayout();// affichage automatique
-        DefaultView view=(DefaultView) viewer.addDefaultView(false);
+        this.view=(DefaultView) viewer.addDefaultView(false);
         
-        pMap.add((Component) view, BorderLayout.CENTER);
+        pMap.add((Component) this.view, BorderLayout.CENTER);
         
         coutEtTrajet = new JLabel("", JLabel.LEFT);
         pMap.add(coutEtTrajet, BorderLayout.SOUTH);
         
         pPrincipal.add(pMap,BorderLayout.CENTER);
+        
+        
+        
+              
         
         //PARTIE EST 
         JPanel pEst = new JPanel(new GridBagLayout());
@@ -260,6 +274,66 @@ public class MaFenetre extends JFrame {
         this.pack();
         this.setContentPane(pPrincipal);
     }
+    
+    private void popup_infos_centre(){
+        JLabel titre_ic = new JLabel("Id :");
+        JLabel t_nom_ic = new JLabel("Type de centre : ");
+        
+        String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
+        int choix = JOptionPane.showOptionDialog(this, "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
+        
+        switch (choix) {
+            case 0:
+                String choixDepart  = JOptionPane.showInputDialog( null, "De quel centre voulez vous partir", "Choix du départ du chemin", JOptionPane.QUESTION_MESSAGE) ;
+                String choixArrivee  = JOptionPane.showInputDialog( null, "A quel centre voulez vous arriver", "Choix de l'arrivée du chemin", JOptionPane.QUESTION_MESSAGE) ;
+                Node depart = grapheActuel.getNode(choixDepart.toUpperCase());
+                Node arrivee = grapheActuel.getNode(choixArrivee.toUpperCase());
+                
+                String[] optionsCh = {"Chemin le plus rapide", "Chemin rapide et fiable", "Annuler"};
+                int choixCh = JOptionPane.showOptionDialog(this, "Quel type de chemin voulez-vous ?", "Choix du chemin", 0, JOptionPane.QUESTION_MESSAGE, null, optionsCh, optionsCh[2]);
+                switch (choixCh) {
+                    case 0:
+                        chemin.cheminDureeMinDijkstra(depart, arrivee);
+                        chemin.visualisationChemin("dureeMin");
+                        coutEtTrajet.setForeground(Color.RED);
+                        coutEtTrajet.setText("Durée : " + chemin.getDureeTotale() + " min. " + chemin.getCentresTraverses());
+                        break;
+                    case 1:
+                        chemin.cheminDureeEstimeeDijkstra(depart, arrivee);
+                        chemin.visualisationChemin("dureeEstimee");
+                        coutEtTrajet.setForeground(Color.GREEN);
+                        coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
+                        break;
+                    default:
+                        throw new AssertionError();
+                        //FAIRE UNE EXCEPTION POUR DIRE QUE LES CHEMINS DE D2PART ET ARRIVEES N4EXISTENT PAS OU AUTRE ERREURS
+                }
+                break;
+
+            case 1:
+                String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
+                int NbV = Integer.parseInt(choixNbV);
+                
+                switch (NbV) {
+                    case 1:
+                        System.out.println("On a pas encore cette possibilité");
+                        break;
+                    case 2:
+                        System.out.println("On a pas encore cette possibilité");
+                        break;
+                    default:
+                        throw new AssertionError();
+                        //FAIRE UNE EXCEPTION PAR RAPPORT AU NB CE V2HICULES OU AUTRE ERREURS
+                } break;
+
+            case 2:break;
+                
+            default:
+                throw new IllegalStateException("Unexpected value: " + choix);
+                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT
+        }
+    }
+    
      
     private void initEcouteurs() {
         //Partie Haut
@@ -270,6 +344,19 @@ public class MaFenetre extends JFrame {
                 System.getLogger(MaFenetre.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
         });
+        
+       
+        
+        view.addMouseListener(new MouseAdapter() {
+        @Override
+            public void mousePressed(MouseEvent e) {
+                popup_infos_centre();
+            }
+        });
+        
+        
+   
+        
         //Nouveau trajet 
         btNouveau_trajet.addActionListener(e -> popup_nouv_t());
 
@@ -291,8 +378,6 @@ public class MaFenetre extends JFrame {
         checkType.addActionListener((ActionEvent e) -> {
             labelCheckCentres();
         });
-        
-
     }
     
     private void popup_nouv_district() throws IOException{
@@ -389,31 +474,7 @@ public class MaFenetre extends JFrame {
         }
     }
     
-    private void popup_infos_centre(){
-        JDialog popup = new JDialog(this, "Information Centre", true);
-        titre_ic = new JLabel("Information Centre");
-        t_nom_ic = new JLabel("Nom");
-        
-        JPanel pan = new JPanel(new GridBagLayout());
-        
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2; 
-        pan.add(titre_ic, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2; 
-        pan.add(t_nom_ic, gbc);
-        
-        popup.setContentPane(pan);
-        popup.pack(); 
-        popup.setLocationRelativeTo(this); 
-        popup.setVisible(true);
-    }
+    
     
     private void recharger_infos(){
         coutEtTrajet.setText("");
