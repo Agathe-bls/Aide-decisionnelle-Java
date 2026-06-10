@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
         MonGraphe g = new MonGraphe("test");
-        g.chargerGraphe("graphe1.csv");
+        g.chargerGraphe("graphe5.csv");
         //g.creerGrapheAleatoire(200);
 
         Tournee v = new Tournee(g, g.getNode("S1"), 2);
