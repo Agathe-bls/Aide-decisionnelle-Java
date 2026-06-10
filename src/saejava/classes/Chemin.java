@@ -99,6 +99,8 @@ public class Chemin {
         Node debut = arrivee;
         this.dureeTotale = (int) (infosTableauDijkstra.get(debut).coutCalcule);
         while (debut != depart) {
+            System.out.println("debut : " + debut.getId());
+            System.out.println("prec : " + infosTableauDijkstra.get(debut).centrePrecedent.getId());
             Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
             this.centresTraverses.add(debut);
             this.routesTraversees.add(entreDeux);
