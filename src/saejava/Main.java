@@ -9,15 +9,19 @@ public class Main {
     public static void main(String[] args) {
         MonGraphe g = new MonGraphe("test");
         g.chargerGraphe("graphe1.csv");
+        //g.creerGrapheAleatoire(200);
 
-        Tournee v = new Tournee(g, g.getNode("S1"), 1);
+        Tournee v = new Tournee(g, g.getNode("S1"), 2);
 
         // null = livrer tous les centres
-        v.calculerTourneeUnVehicule(null);
+        v.calculerTourneeDeuxVehicules();
+        //v.calculerTourneeUnVehicule(null);
 
-        v.afficherTournee();
+        v.afficherTournee(0);
+        v.afficherTournee(1);
 
-        v.colorierTourneeUnVehicule();
+        v.colorierTourneeUnVehicule(0);
+        v.colorierTourneeUnVehicule(1);
         g.display();
 
 

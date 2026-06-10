@@ -1,5 +1,7 @@
 package saejava.classes;
 
+import static java.awt.Color.lightGray;
+
 import java.util.ArrayList;
 
 import org.graphstream.graph.Node;
@@ -8,25 +10,27 @@ public class Tournee {
     private class Vehicule {
         public ArrayList<Node> centresLivres = new ArrayList<>();
         public ArrayList<Chemin> trajets = new ArrayList<>();
+        public Node positionActuelle;
+        public int dureeTotale;
+        public Vehicule(Node positionDepart) {
+            this.positionActuelle = positionDepart;
+            this.dureeTotale = 0;
+        }
     }
     private MonGraphe graphe;
-    private Node positionActuelle;
     private ArrayList<Vehicule> lstVehicules = new ArrayList<>();
-    private int dureeTotale;
 
-    public Tournee(MonGraphe graphe, Node positionActuelle, int nbVehicule) {
+    public Tournee(MonGraphe graphe, Node positionDepart, int nbVehicule) {
         this.graphe = graphe;
-        this.positionActuelle = positionActuelle;
         if (nbVehicule == 1)
-            this.lstVehicules.add(new Vehicule());
+            this.lstVehicules.add(new Vehicule(positionDepart));
         else
-            this.lstVehicules.add(new Vehicule());
-            this.lstVehicules.add(new Vehicule());
-        this.dureeTotale = 0;
+            this.lstVehicules.add(new Vehicule(positionDepart));
+            this.lstVehicules.add(new Vehicule(positionDepart));
     }
 
-    public Node getPositionActuelle() {
-        return positionActuelle;
+    public Node getPositionActuelle(Vehicule vehicule) {
+        return vehicule.positionActuelle;
     }
 
     public ArrayList<Node> getCentresLivres(Vehicule v) {
@@ -37,8 +41,8 @@ public class Tournee {
         return v.trajets;
     }
 
-    public int getDureeTotale() {
-        return dureeTotale;
+    public int getDureeTotale(int vehiculeChoisi) {
+        return lstVehicules.get(vehiculeChoisi).dureeTotale;
     }
 
     public ArrayList<Node> getCentresALivrer(String type) { // pour info on mettra null en parametre quand on veut tous les type de centre c plus simple
@@ -54,7 +58,7 @@ public class Tournee {
         return centres;
     }
 
-    private Node trouverCentrePlusProche(ArrayList<Node> centresPasLivres) {
+    private Node trouverCentrePlusProche(ArrayList<Node> centresPasLivres, Node positionActuelle) {
         if (centresPasLivres.isEmpty()) {
             return null;
         }
@@ -78,12 +82,13 @@ public class Tournee {
 
     public void calculerTourneeUnVehicule(String type) {
         ArrayList<Node> centresPasLivres = getCentresALivrer(type);
+        Node positionActuelle = lstVehicules.get(0).positionActuelle;
 
         lstVehicules.get(0).centresLivres.add(positionActuelle);
         centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie...
 
         while(!centresPasLivres.isEmpty()) {
-            Node centrePlusProche = trouverCentrePlusProche(centresPasLivres);
+            Node centrePlusProche = trouverCentrePlusProche(centresPasLivres, positionActuelle);
 
             if (centrePlusProche == null) {
                 throw new IllegalStateException("Aucun centre accessible depuis " + positionActuelle.getId());
@@ -93,7 +98,7 @@ public class Tournee {
             trajet.cheminDureeMinDijkstra(positionActuelle, centrePlusProche);
             lstVehicules.get(0).trajets.add(trajet);
             lstVehicules.get(0).centresLivres.add(centrePlusProche);
-            dureeTotale += trajet.getDureeTotale();
+            lstVehicules.get(0).dureeTotale += trajet.getDureeTotale();
             positionActuelle = centrePlusProche;
             centresPasLivres.remove(centrePlusProche);
         }
@@ -101,37 +106,65 @@ public class Tournee {
 
     public void calculerTourneeDeuxVehicules() {
         ArrayList<Node> centresPasLivres = getCentresALivrer(null);
+        int vehiculeChoisi = 0;
+        
+        ArrayList<Node> positionActuelle = new ArrayList<>();
+        positionActuelle.add(lstVehicules.get(0).positionActuelle);
+        positionActuelle.add(lstVehicules.get(1).positionActuelle);
 
-        centresPasLivres.remove(positionActuelle);
+        lstVehicules.get(0).centresLivres.add(positionActuelle.get(vehiculeChoisi));
+        lstVehicules.get(1).centresLivres.add(positionActuelle.get(vehiculeChoisi));
+        centresPasLivres.remove(positionActuelle.get(vehiculeChoisi));
+
+        while(!centresPasLivres.isEmpty()) {
+            Node centrePlusProche = trouverCentrePlusProche(centresPasLivres, positionActuelle.get(vehiculeChoisi));
+
+            if (centrePlusProche == null) {
+                throw new IllegalStateException("Aucun centre accessible depuis " + positionActuelle.get(vehiculeChoisi).getId());
+            }
+
+            Chemin trajet = new Chemin(graphe);
+            trajet.cheminDureeMinDijkstra(positionActuelle.get(vehiculeChoisi), centrePlusProche);
+            lstVehicules.get(vehiculeChoisi).trajets.add(trajet);
+            lstVehicules.get(vehiculeChoisi).centresLivres.add(centrePlusProche);
+            lstVehicules.get(vehiculeChoisi).dureeTotale += trajet.getDureeTotale();
+            positionActuelle.set(vehiculeChoisi, centrePlusProche);
+            centresPasLivres.remove(centrePlusProche);
+
+            if (vehiculeChoisi == 0)
+                vehiculeChoisi = 1;
+            else
+                vehiculeChoisi = 0;
+        }
     }
 
-    public void colorierTourneeUnVehicule() {
-        for (Chemin chemin : lstVehicules.get(0).trajets) {
-            chemin.visualisationTournee(1);
+    public void colorierTourneeUnVehicule(int vehiculeChoisi) {
+        for (Chemin chemin : lstVehicules.get(vehiculeChoisi).trajets) {
+            chemin.visualisationTournee(vehiculeChoisi+1);
         }
     }
 
     // pour debugger et afficher
-    public void afficherTournee() {
+    public void afficherTournee(int vehiculeChosi) {
         System.out.println("===== Tournee du véhicule =====");
 
-        if (lstVehicules.get(0).trajets.isEmpty()) {
+        if (lstVehicules.get(vehiculeChosi).trajets.isEmpty()) {
             System.out.println("Aucun trajet calculé.");
             return;
         }
 
         System.out.println("Centres livrés :");
 
-        for (Node n : lstVehicules.get(0).centresLivres) {
+        for (Node n : lstVehicules.get(vehiculeChosi).centresLivres) {
             System.out.println("- " + n.getId() + " (" + n.getAttribute("type") + ")");
         }
 
         System.out.println("\nTrajets :");
 
-        for (Chemin c : lstVehicules.get(0).trajets) {
+        for (Chemin c : lstVehicules.get(vehiculeChosi).trajets) {
             System.out.println(c);
         }
 
-        System.out.println("\nDurée totale : " + dureeTotale + " min");
+        System.out.println("\nDurée totale : " + lstVehicules.get(vehiculeChosi).dureeTotale + " min");
     }
 }

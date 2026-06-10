@@ -211,7 +211,7 @@ public class Chemin {
                 for (Edge e : routesTraversees) {
                     e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
                 }
-                centresTraverses.get(0).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
+                centresTraverses.get(0).addAttribute("ui.label", ""+centresTraverses.get(0).getId());
                 centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px;");
                 break;
 
