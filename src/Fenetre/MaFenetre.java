@@ -317,7 +317,7 @@ public class MaFenetre extends JFrame {
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 grapheActuel.clear();
-                grapheActuel.creaGraphealea(Integer.parseInt(reponse));
+                grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 break;
 
