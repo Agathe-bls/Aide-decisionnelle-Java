@@ -55,12 +55,6 @@ public class Chemin {
         return routesTraversees;
     }
 
-    @Override
-    public String toString() {
-        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
-                + dureeEstimee + "]";
-    }
-
     public String getCentresTraverses() {
         String resultat = "";
         for (Node n : centresTraverses) {
@@ -71,6 +65,12 @@ public class Chemin {
         }
         resultat = "Chemin pris : " + resultat;
         return resultat;
+    }
+    
+    @Override
+    public String toString() {
+        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
+                + dureeEstimee + "]";
     }
 
     public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
@@ -99,8 +99,6 @@ public class Chemin {
         Node debut = arrivee;
         this.dureeTotale = (int) (infosTableauDijkstra.get(debut).coutCalcule);
         while (debut != depart) {
-            System.out.println("debut : " + debut.getId());
-            System.out.println("prec : " + infosTableauDijkstra.get(debut).centrePrecedent.getId());
             Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
             this.centresTraverses.add(debut);
             this.routesTraversees.add(entreDeux);
@@ -249,7 +247,7 @@ public class Chemin {
 
     public void clearVisualisations() {
         grapheAssocie.visualisationGraphe();
-        for (Edge e : routesTraversees) {
+        for (Edge e : grapheAssocie.getEachEdge()) {
             if (e.hasAttribute("ui.style")) {
                 e.changeAttribute("ui.style", "fill-color: darck; size: 1px;");
             }

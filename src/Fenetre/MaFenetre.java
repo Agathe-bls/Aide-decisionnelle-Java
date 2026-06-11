@@ -77,8 +77,8 @@ public class MaFenetre extends JFrame {
     private Chemin chemin = new Chemin(grapheActuel);
     private JLabel coutEtTrajet;
     
-    private Tournee tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
-    private Tournee tournee2V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 2);
+    private Tournee tournee1V;
+    private Tournee tournee2V;
     
     //Partie Est 
     private JLabel titreComboC;
@@ -460,21 +460,28 @@ public class MaFenetre extends JFrame {
                         String type = null;
                         switch(TypeCentres){
                             case 0 : type = "N"; break;
-                            case 1 : type = "O"; break;
-                            case 2 : type = "M"; break;
+                            case 1 : type = "M"; break;
+                            case 2 : type = "O"; break;
                             case 3 : type = null; break;
                             default : type = null; break;
                         }
-                        
+                        tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
                         tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
-                        tournee1V.colorierTourneeUnVehicule(1);
-                        System.out.println("On a pas encore cette possibilité");
+                        tournee1V.colorierTourneeUnVehicule(0);
+                        coutEtTrajet.setForeground(Color.GREEN);
+                        coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
+                        
                         break;
                     case 2:
+                        tournee2V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 2);
                         tournee2V.calculerTourneeDeuxVehicules();
+                        
+                        tournee2V.colorierTourneeUnVehicule(0);
                         tournee2V.colorierTourneeUnVehicule(1);
-                        tournee2V.colorierTourneeUnVehicule(2);
-                        System.out.println("On a pas encore cette possibilité");
+                        
+                        coutEtTrajet.setForeground(Color.BLUE);
+                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        
                         break;
                     default:
                         throw new AssertionError();
@@ -485,10 +492,9 @@ public class MaFenetre extends JFrame {
                 
             default:
                 throw new IllegalStateException("Unexpected value: " + choix);
-                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT
+                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT IL FAUT PEUT ETRE METTRE UN DEFAULT EXIT OU JS QUOI
         }
     }
-    
     
     private void recharger_infos(){
         coutEtTrajet.setText("");

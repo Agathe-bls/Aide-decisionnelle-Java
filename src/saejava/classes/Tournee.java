@@ -5,6 +5,7 @@
 package saejava.classes;
 
 import java.util.ArrayList;
+import org.graphstream.graph.Edge;
 
 import org.graphstream.graph.Node;
 
@@ -37,6 +38,18 @@ public class Tournee {
 
     public ArrayList<Node> getCentresLivres(Vehicule v) {
         return v.centresLivres;
+    }
+    
+    public String getLabelCentresLivres(int vehiculeChoisi) {
+        String resultat = "";
+        for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {
+            if (lstVehicules.get(vehiculeChoisi).centresLivres.get(0) == n)
+                resultat = n.getId();
+            else 
+                resultat = n.getId() + " > " + resultat;
+        }
+        resultat = "Chemin pris par V" + vehiculeChoisi+1 + " : " + resultat;
+        return resultat;
     }
 
     public ArrayList<Chemin> getTrajets(Vehicule v) {
@@ -87,7 +100,7 @@ public class Tournee {
         Node positionActuelle = lstVehicules.get(0).positionActuelle;
 
         lstVehicules.get(0).centresLivres.add(positionActuelle);
-        centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie... //////////////////////////////////////////
+        //centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie... //////////////////////////////////////////
 
         while(!centresPasLivres.isEmpty()) {
             Node centrePlusProche = trouverCentrePlusProche(centresPasLivres, positionActuelle);
