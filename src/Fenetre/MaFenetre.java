@@ -134,7 +134,7 @@ public class MaFenetre extends JFrame {
         checkFia = new JCheckBoxMenuItem("Fiabilités");
         checkDuree = new JCheckBoxMenuItem("Durées");
         checkDistance = new JCheckBoxMenuItem("Distances");
-        seuil_test = new JSpinner(new SpinnerNumberModel(1,0,1,0.1));
+        seuil_test = new JSpinner(new SpinnerNumberModel(0.1,0.1,1,0.1));
         seuil_test.setPreferredSize(new Dimension(173,20));
         
         
@@ -411,7 +411,6 @@ public class MaFenetre extends JFrame {
                 throw new IllegalStateException("Unexpected value: " + choix);
         }
         recharger_infos();
-        testGraphPresent();
     }
     
     private void popup_nouv_t(){
@@ -468,7 +467,7 @@ public class MaFenetre extends JFrame {
                         tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
                         tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
                         tournee1V.colorierTourneeUnVehicule(0);
-                        coutEtTrajet.setForeground(Color.GREEN);
+                        coutEtTrajet.setForeground(Color.MAGENTA);
                         coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
                         
                         break;
@@ -479,7 +478,7 @@ public class MaFenetre extends JFrame {
                         tournee2V.colorierTourneeUnVehicule(0);
                         tournee2V.colorierTourneeUnVehicule(1);
                         
-                        coutEtTrajet.setForeground(Color.BLUE);
+                        coutEtTrajet.setForeground(Color.RED);
                         coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
                         
                         break;
@@ -497,10 +496,12 @@ public class MaFenetre extends JFrame {
     }
     
     private void recharger_infos(){
+        testGraphPresent();
         coutEtTrajet.setText("");
         grapheActuel.visualisationGraphe();
         nbCentresParType();
-        seuil_test.setValue(1.0);
+        
+        seuil_test.setValue(0.2);
     }
     
     private void nbCentresParType(){
@@ -571,6 +572,34 @@ public class MaFenetre extends JFrame {
         }
     }
     
+    private void labelCheckUneRoute(Edge route){
+            String label = "";
+
+            if (checkFia.isSelected()) {
+                label += route.getAttribute("fiabilite") + " fia";
+            }
+
+            if (checkDuree.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("duree") + " min";
+            }
+
+            if (checkDistance.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("distance") + " km";
+            }
+
+            
+                route.addAttribute("ui.label", label);
+            
+            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
+        
+    }
+    
     private void labelCheckCentres(){
         for(Node centre : grapheActuel.getEachNode()){
             String label = "";
@@ -591,11 +620,15 @@ public class MaFenetre extends JFrame {
     private void visuSeuil() {
         seuil_test.addChangeListener((ChangeEvent e) -> {
             for (Edge route : grapheActuel.getEachEdge()) {
-                if (((double) route.getAttribute("fiabilite")) > ((double)seuil_test.getValue())) {
-                    
+                double fiaRoute = (route.getAttribute("fiabilite"));
+                double seuil = (double) seuil_test.getValue();
+                if (fiaRoute < seuil) {
                     route.addAttribute("ui.label", " ⚠ ");
                     route.addAttribute("ui.style", "text-size: 25; icon: dyn-icon; icon-mode: at-left; ");
                     route.addAttribute("ui.icon", "attention.jpg");
+                }
+                else {
+                    labelCheckUneRoute(route);
                 }
             }
         });

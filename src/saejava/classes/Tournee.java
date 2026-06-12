@@ -41,14 +41,15 @@ public class Tournee {
     }
     
     public String getLabelCentresLivres(int vehiculeChoisi) {
-        String resultat = "";
-        for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {
-            if (lstVehicules.get(vehiculeChoisi).centresLivres.get(0) == n)
-                resultat = n.getId();
-            else 
-                resultat = n.getId() + " > " + resultat;
+        String resultat = "Chemin pris :";
+        if (lstVehicules.get(vehiculeChoisi).trajets.isEmpty()) {
+            resultat += "aucun trajet calculé.";
         }
-        resultat = "Chemin pris par V" + vehiculeChoisi+1 + " : " + resultat;
+        else {
+            for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {
+                resultat += ("/" + n.getId() + " (" + n.getAttribute("type") + ")");
+            }
+        }        
         return resultat;
     }
 
