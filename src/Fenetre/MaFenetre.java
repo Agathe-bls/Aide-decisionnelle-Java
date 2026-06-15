@@ -9,18 +9,19 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,7 +30,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
@@ -39,6 +39,7 @@ import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
 import saejava.classes.MonGraphe;
 import saejava.classes.Chemin;
+import saejava.classes.Tournee;
 
 /**
  *
@@ -69,14 +70,18 @@ public class MaFenetre extends JFrame {
     private JLabel nbr_bo;
     private JPanel couleur_bo;
     
-    //Partie Haut Nouveau trajets
-    private JButton btNouveau_trajet;
-    
     //Map
     private MonGraphe grapheActuel = new MonGraphe("gActuel");
     private JPanel pMap;
+    
+    //Partie Haut Nouveau trajets
+    private JButton btNouveau_trajet;
+    
     private Chemin chemin = new Chemin(grapheActuel);
     private JLabel coutEtTrajet;
+    
+    private Tournee tournee1V;
+    private Tournee tournee2V;
     
     //Partie Est 
     private JLabel titreComboC;
@@ -132,7 +137,7 @@ public class MaFenetre extends JFrame {
         checkFia = new JCheckBoxMenuItem("Fiabilités");
         checkDuree = new JCheckBoxMenuItem("Durées");
         checkDistance = new JCheckBoxMenuItem("Distances");
-        seuil_test = new JSpinner(new SpinnerNumberModel(1,0,1,0.1));
+        seuil_test = new JSpinner(new SpinnerNumberModel(0.1,0.1,1,0.1));
         seuil_test.setPreferredSize(new Dimension(173,20));
         
         
@@ -275,12 +280,12 @@ public class MaFenetre extends JFrame {
         this.setContentPane(pPrincipal);
     }
     
-    private void popup_infos_centre(){
-        JLabel titre_ic = new JLabel("Id :");
-        JLabel t_nom_ic = new JLabel("Type de centre : ");
+    private void popup_infos_centre(Node n){
+        JLabel titre_ic = new JLabel("Id :" + n.getId());
+        JLabel t_nom_ic = new JLabel("Type de centre : " + grapheActuel.getTypeComplet(n));
         
         String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
-        int choix = JOptionPane.showOptionDialog(this, "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
+        int choix = JOptionPane.showOptionDialog(this, titre_ic + "\n" + t_nom_ic + "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
         
         switch (choix) {
             case 0:
@@ -347,21 +352,26 @@ public class MaFenetre extends JFrame {
         
        
         
-        view.addMouseListener(new MouseAdapter() {
-        @Override
-            public void mousePressed(MouseEvent e) {
-                // 1. GraphStream cherche directement l'élément graphique typé sous le clic
-                GraphicElement element = view.findNodeOrSpriteAt(e.getX(), e.getY());
-                
-                // 2. On vérifie si on a touché quelque chose ET qu'il s'agit bien d'un Node
-                if (element != null && element instanceof org.graphstream.graph.Node) {
-                    popup_infos_centre();
-                }
-                // Si element est nul, c'est l'arrière-plan : il ne se passe rien !
+     view.addMouseListener(new MouseAdapter() {
+    @Override
+    public void mousePressed(MouseEvent e) {
+        
+        GraphicsConfiguration gc = view.getGraphicsConfiguration();
+        AffineTransform tx = gc.getDefaultTransform();
+ 
+        float abscisse = (float) (e.getX()*tx.getScaleX());
+        float ordonnee = (float) (e.getY()*tx.getScaleY());
+        
+        GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
+        System.out.println(element);
+        if (element != null) {
+            Node n = grapheActuel.getNode(element.getId());
+            if (n != null) {
+                popup_infos_centre(n);
             }
-        });
-        
-        
+        }
+    }
+});
    
         
         //Nouveau trajet 
@@ -409,7 +419,7 @@ public class MaFenetre extends JFrame {
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 grapheActuel.clear();
-                grapheActuel.creaGraphealea(Integer.parseInt(reponse));
+                grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 break;
 
@@ -420,7 +430,6 @@ public class MaFenetre extends JFrame {
                 throw new IllegalStateException("Unexpected value: " + choix);
         }
         recharger_infos();
-        testGraphPresent();
     }
     
     private void popup_nouv_t(){
@@ -463,10 +472,34 @@ public class MaFenetre extends JFrame {
                 
                 switch (NbV) {
                     case 1:
-                        System.out.println("On a pas encore cette possibilité");
+                        String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
+                        int TypeCentres  = JOptionPane.showOptionDialog(this, "Quel type de centre voulez vous dans votre tournée?", "Choix du type des centres de la tournée", 0, JOptionPane.QUESTION_MESSAGE, null, choixTypeCentres, choixTypeCentres[3]) ;
+                        
+                        String type = null;
+                        switch(TypeCentres){
+                            case 0 : type = "N"; break;
+                            case 1 : type = "M"; break;
+                            case 2 : type = "O"; break;
+                            case 3 : type = null; break;
+                            default : type = null; break;
+                        }
+                        tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
+                        tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
+                        tournee1V.colorierTourneeUnVehicule(0);
+                        coutEtTrajet.setForeground(Color.MAGENTA);
+                        coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
+                        
                         break;
                     case 2:
-                        System.out.println("On a pas encore cette possibilité");
+                        tournee2V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 2);
+                        tournee2V.calculerTourneeDeuxVehicules();
+                        
+                        tournee2V.colorierTourneeUnVehicule(0);
+                        tournee2V.colorierTourneeUnVehicule(1);
+                        
+                        coutEtTrajet.setForeground(Color.RED);
+                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        
                         break;
                     default:
                         throw new AssertionError();
@@ -477,17 +510,17 @@ public class MaFenetre extends JFrame {
                 
             default:
                 throw new IllegalStateException("Unexpected value: " + choix);
-                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT
+                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT IL FAUT PEUT ETRE METTRE UN DEFAULT EXIT OU JS QUOI
         }
     }
     
-    
-    
     private void recharger_infos(){
+        testGraphPresent();
         coutEtTrajet.setText("");
         grapheActuel.visualisationGraphe();
         nbCentresParType();
-        seuil_test.setValue(1.0);
+        
+        seuil_test.setValue(0.2);
     }
     
     private void nbCentresParType(){
@@ -558,6 +591,34 @@ public class MaFenetre extends JFrame {
         }
     }
     
+    private void labelCheckUneRoute(Edge route){
+            String label = "";
+
+            if (checkFia.isSelected()) {
+                label += route.getAttribute("fiabilite") + " fia";
+            }
+
+            if (checkDuree.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("duree") + " min";
+            }
+
+            if (checkDistance.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("distance") + " km";
+            }
+
+            
+                route.addAttribute("ui.label", label);
+            
+            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
+        
+    }
+    
     private void labelCheckCentres(){
         for(Node centre : grapheActuel.getEachNode()){
             String label = "";
@@ -578,11 +639,15 @@ public class MaFenetre extends JFrame {
     private void visuSeuil() {
         seuil_test.addChangeListener((ChangeEvent e) -> {
             for (Edge route : grapheActuel.getEachEdge()) {
-                if (((double) route.getAttribute("fiabilite")) > ((double)seuil_test.getValue())) {
-                    
+                double fiaRoute = (route.getAttribute("fiabilite"));
+                double seuil = (double) seuil_test.getValue();
+                if (fiaRoute < seuil) {
                     route.addAttribute("ui.label", " ⚠ ");
                     route.addAttribute("ui.style", "text-size: 25; icon: dyn-icon; icon-mode: at-left; ");
                     route.addAttribute("ui.icon", "attention.jpg");
+                }
+                else {
+                    labelCheckUneRoute(route);
                 }
             }
         });
