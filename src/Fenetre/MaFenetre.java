@@ -350,7 +350,14 @@ public class MaFenetre extends JFrame {
         view.addMouseListener(new MouseAdapter() {
         @Override
             public void mousePressed(MouseEvent e) {
-                popup_infos_centre();
+                // 1. GraphStream cherche directement l'élément graphique typé sous le clic
+                GraphicElement element = view.findNodeOrSpriteAt(e.getX(), e.getY());
+                
+                // 2. On vérifie si on a touché quelque chose ET qu'il s'agit bien d'un Node
+                if (element != null && element instanceof org.graphstream.graph.Node) {
+                    popup_infos_centre();
+                }
+                // Si element est nul, c'est l'arrière-plan : il ne se passe rien !
             }
         });
         
