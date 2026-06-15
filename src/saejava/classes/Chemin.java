@@ -36,45 +36,42 @@ public class Chemin {
     }
     //NORMALEMENT IL Y A PAS DE PROBLEME MAIS IL FAUT PEUT ETRE METTRE UNE EXCEPTION POUR ETRE SUR QUE DEPART/GRAPH/ARRIVEE VIENNENT BIEN DU MËME GRAPHE
 
-    //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
-    public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
-        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
+    public double getFiabiliteTotale() {
+        return fiabiliteTotale;
+    }
+    
+    public int getDistanceTotale() {
+        return distanceTotale;
+    }
 
-        //regarder pour chaque centre non traité un par un en prenant celui avec la plus petite durée Estimée si en le rajoutant aux chemin il permet de diminuer sa durée Estimée
-        while (!finTraitement(infosTableauDijkstra)) {
-            Node nTraite = centreAValeurMin(infosTableauDijkstra);
-            double EstimationActuel = (infosTableauDijkstra.get(nTraite).coutCalcule);
+    public int getDureeTotale() {
+        return dureeTotale;
+    }
 
-            Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
-            while (itVoisins.hasNext()) {
-                Node voisin = itVoisins.next();
-                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double)voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
-                    double EstimationAvecVoisin = EstimationActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree")) * (20 - (double) (voisin.getEdgeBetween(nTraite).getAttribute("fiabilite"))) / 10;
-                    if (EstimationAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
-                        infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
-                        infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
-                    }
-                }
-            }
-            infosTableauDijkstra.get(nTraite).estTraite = true;
+    public double getDureeEstimee() {
+        return dureeEstimee;
+    }
+
+    public ArrayList<Edge> getRoutesTraversees() {
+        return routesTraversees;
+    }
+
+    public String getCentresTraverses() {
+        String resultat = "";
+        for (Node n : centresTraverses) {
+            if (centresTraverses.get(0) == n)
+                resultat = n.getId();
+            else 
+                resultat = n.getId() + " > " + resultat;
         }
-        //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
-        Node debut = arrivee;
-        this.dureeEstimee = (infosTableauDijkstra.get(debut).coutCalcule);
-        while (debut != depart) {
-            Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
-            this.centresTraverses.add(debut);
-            this.routesTraversees.add(entreDeux);
-            this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
-            this.dureeTotale += (Integer) (entreDeux.getAttribute("duree"));
-            this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
-
-            debut = (infosTableauDijkstra.get(debut).centrePrecedent);
-        }
-        this.fiabiliteTotale = this.fiabiliteTotale / (this.centresTraverses.size() - 1);
-        this.centresTraverses.add(depart);
-
-        return this;
+        resultat = "Chemin pris : " + resultat;
+        return resultat;
+    }
+    
+    @Override
+    public String toString() {
+        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
+                + dureeEstimee + "]";
     }
 
     public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
@@ -112,6 +109,47 @@ public class Chemin {
 
             debut = (infosTableauDijkstra.get(debut).centrePrecedent);
         }
+        this.centresTraverses.add(depart);
+
+        return this;
+    }
+
+    //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
+    public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
+        HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
+
+        //regarder pour chaque centre non traité un par un en prenant celui avec la plus petite durée Estimée si en le rajoutant aux chemin il permet de diminuer sa durée Estimée
+        while (!finTraitement(infosTableauDijkstra)) {
+            Node nTraite = centreAValeurMin(infosTableauDijkstra);
+            double EstimationActuel = (infosTableauDijkstra.get(nTraite).coutCalcule);
+
+            Iterator<Node> itVoisins = nTraite.getNeighborNodeIterator();
+            while (itVoisins.hasNext()) {
+                Node voisin = itVoisins.next();
+                if ((infosTableauDijkstra.get(voisin).estTraite) == false && 0.25 <= (double) voisin.getEdgeBetween(nTraite).getAttribute("fiabilite")) {
+                    double EstimationAvecVoisin = EstimationActuel + (int) (voisin.getEdgeBetween(nTraite).getAttribute("duree")) * (20 - (double) (voisin.getEdgeBetween(nTraite).getAttribute("fiabilite"))) / 10;
+                    if (EstimationAvecVoisin < (infosTableauDijkstra.get(voisin).coutCalcule)) {
+                        infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
+                        infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
+                    }
+                }
+            }
+            infosTableauDijkstra.get(nTraite).estTraite = true;
+        }
+        //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
+        Node debut = arrivee;
+        this.dureeEstimee = (infosTableauDijkstra.get(debut).coutCalcule);
+        while (debut != depart) {
+            Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
+            this.centresTraverses.add(debut);
+            this.routesTraversees.add(entreDeux);
+            this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
+            this.dureeTotale += (Integer) (entreDeux.getAttribute("duree"));
+            this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
+
+            debut = (infosTableauDijkstra.get(debut).centrePrecedent);
+        }
+        this.fiabiliteTotale = this.fiabiliteTotale / (this.centresTraverses.size() - 1);
         this.centresTraverses.add(depart);
 
         return this;
@@ -172,29 +210,17 @@ public class Chemin {
         }
         return centreMin;
     }
-    
-//    private MonGraphe grapheAssocie
-//    private double fiabiliteTotale;
-//    private int distanceTotale;
-//    private int dureeTotale;
-//    private double dureeEstimee;    //avec la fiabilité
-//    private ArrayList<Node> centresTraverses;
+
     //Visualisation des chemins : 
-    
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
             for (Edge e : routesTraversees) {
                 e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
             }
-            centresTraverses.get(1).addAttribute("ui.label", "Durée :" + this.dureeEstimee);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px; text-color: black;");
-        }
-        else if (typeChemin.equals("dureeEstimee")) {
+        } else if (typeChemin.equals("dureeEstimee")) {
             for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px; shape : cubic-curve; arrow-shape : arrow;");
             }
-            centresTraverses.get(1).addAttribute("ui.label", "Durée estimée:" + this.dureeTotale);
-            centresTraverses.get(1).addAttribute("ui.style", "text-size: 20px;");
         }
     }
     
@@ -220,6 +246,7 @@ public class Chemin {
         }
     }
 
+<<<<<<< HEAD
     public double getFiabiliteTotale() {
         return fiabiliteTotale;
     }
@@ -248,5 +275,14 @@ public class Chemin {
     public String toString() {
         return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
                 + dureeEstimee + "]";
+=======
+    public void clearVisualisations() {
+        grapheAssocie.visualisationGraphe();
+        for (Edge e : grapheAssocie.getEachEdge()) {
+            if (e.hasAttribute("ui.style")) {
+                e.changeAttribute("ui.style", "fill-color: darck; size: 1px;");
+            }
+        }
+>>>>>>> Agathe-Graphe_aleatoire
     }
 }

@@ -6,6 +6,7 @@ import saejava.classes.Tournee;
 
 public class Main {
 
+<<<<<<< HEAD
     public static void main(String[] args) {
         MonGraphe g = new MonGraphe("test");
         g.chargerGraphe("graphe5.csv");
@@ -50,6 +51,12 @@ public class Main {
 
     private static void testerCSV(String fichier) {
         System.out.println("\nTest du fichier : " + fichier);
+=======
+    public static void main(String[] args) { 
+        
+    MaFenetre f = new MaFenetre();
+//déplacer les sommets 
+>>>>>>> Agathe-Graphe_aleatoire
 
         MonGraphe g = new MonGraphe("test-" + fichier);
         g.chargerGraphe(fichier);
