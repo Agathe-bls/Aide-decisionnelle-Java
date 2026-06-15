@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-package saejava.classes;
-
-import static java.awt.Color.lightGray;
-
-import java.util.ArrayList;
-=======
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -13,7 +6,6 @@ package saejava.classes;
 
 import java.util.ArrayList;
 import org.graphstream.graph.Edge;
->>>>>>> Agathe-Graphe_aleatoire
 
 import org.graphstream.graph.Node;
 
@@ -47,8 +39,6 @@ public class Tournee {
     public ArrayList<Node> getCentresLivres(Vehicule v) {
         return v.centresLivres;
     }
-<<<<<<< HEAD
-=======
     
     public String getLabelCentresLivres(int vehiculeChoisi) {
         String resultat = "Chemin pris :";
@@ -62,7 +52,6 @@ public class Tournee {
         }        
         return resultat;
     }
->>>>>>> Agathe-Graphe_aleatoire
 
     public ArrayList<Chemin> getTrajets(Vehicule v) {
         return v.trajets;
@@ -112,11 +101,8 @@ public class Tournee {
         Node positionActuelle = lstVehicules.get(0).positionActuelle;
 
         lstVehicules.get(0).centresLivres.add(positionActuelle);
-<<<<<<< HEAD
-        centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie...
-=======
+
         //centresPasLivres.remove(positionActuelle); // j'ai enlevé le centre de départ car deja visité en theorie... //////////////////////////////////////////
->>>>>>> Agathe-Graphe_aleatoire
 
         while(!centresPasLivres.isEmpty()) {
             Node centrePlusProche = trouverCentrePlusProche(centresPasLivres, positionActuelle);

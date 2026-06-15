@@ -246,36 +246,6 @@ public class Chemin {
         }
     }
 
-<<<<<<< HEAD
-    public double getFiabiliteTotale() {
-        return fiabiliteTotale;
-    }
-
-    public int getDistanceTotale() {
-        return distanceTotale;
-    }
-
-    public int getDureeTotale() {
-        return dureeTotale;
-    }
-
-    public double getDureeEstimee() {
-        return dureeEstimee;
-    }
-
-    public ArrayList<Node> getCentresTraverses() {
-        return centresTraverses;
-    }
-
-    public ArrayList<Edge> getRoutesTraversees() {
-        return routesTraversees;
-    }
-
-    @Override
-    public String toString() {
-        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
-                + dureeEstimee + "]";
-=======
     public void clearVisualisations() {
         grapheAssocie.visualisationGraphe();
         for (Edge e : grapheAssocie.getEachEdge()) {
@@ -283,6 +253,5 @@ public class Chemin {
                 e.changeAttribute("ui.style", "fill-color: darck; size: 1px;");
             }
         }
->>>>>>> Agathe-Graphe_aleatoire
     }
 }
