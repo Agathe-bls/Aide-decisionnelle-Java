@@ -46,10 +46,13 @@ public class Tournee {
             resultat += "aucun trajet calculé.";
         }
         else {
-            for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {
-                resultat += ("/" + n.getId() + " (" + n.getAttribute("type") + ")");
+            for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {                
+                if (lstVehicules.get(0) == n)
+                    resultat = n.getId();
+                else 
+                    resultat += n.getId() + " > ";
             }
-        }        
+        }
         return resultat;
     }
 

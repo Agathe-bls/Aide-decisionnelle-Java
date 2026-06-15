@@ -469,6 +469,8 @@ public class MaFenetre extends JFrame {
                         tournee1V.colorierTourneeUnVehicule(0);
                         coutEtTrajet.setForeground(Color.MAGENTA);
                         coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
+                        tournee1V.afficherTournee(0);
+                        
                         
                         break;
                     case 2:
@@ -480,6 +482,8 @@ public class MaFenetre extends JFrame {
                         
                         coutEtTrajet.setForeground(Color.RED);
                         coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        tournee2V.afficherTournee(0);
+                        tournee2V.afficherTournee(1);
                         
                         break;
                     default:

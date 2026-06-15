@@ -104,7 +104,7 @@ public class Chemin {
             this.routesTraversees.add(entreDeux);
             this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
             this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
-            this.dureeEstimee += (int) (entreDeux.getAttribute("duree")) * (20 - (double) (entreDeux.getAttribute("fiabilite"))) / 10;
+            this.dureeEstimee += (Double) (entreDeux.getAttribute("duree")) * (20 - (double) (entreDeux.getAttribute("fiabilite"))) / 10;
 
             debut = (infosTableauDijkstra.get(debut).centrePrecedent);
         }
@@ -137,7 +137,7 @@ public class Chemin {
         }
         //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
         Node debut = arrivee;
-        this.dureeEstimee = (infosTableauDijkstra.get(debut).coutCalcule);
+        this.dureeEstimee = ((int)(infosTableauDijkstra.get(debut).coutCalcule));
         while (debut != depart) {
             Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
             this.centresTraverses.add(debut);
@@ -156,7 +156,6 @@ public class Chemin {
 
     //LES FONCTIONS SECONDAIRES UTILISEES POUR L'ALGO :
     public class InfosCentresDijkstra {
-
         private double coutCalcule;
         private Node centrePrecedent;
         private boolean estTraite;
