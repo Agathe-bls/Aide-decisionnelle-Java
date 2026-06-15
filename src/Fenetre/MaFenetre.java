@@ -9,12 +9,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -32,6 +34,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
+import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
 import saejava.classes.MonGraphe;
@@ -277,12 +280,12 @@ public class MaFenetre extends JFrame {
         this.setContentPane(pPrincipal);
     }
     
-    private void popup_infos_centre(){
-        JLabel titre_ic = new JLabel("Id :");
-        JLabel t_nom_ic = new JLabel("Type de centre : ");
+    private void popup_infos_centre(Node n){
+        JLabel titre_ic = new JLabel("Id :" + n.getId());
+        JLabel t_nom_ic = new JLabel("Type de centre : " + grapheActuel.getTypeComplet(n));
         
         String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
-        int choix = JOptionPane.showOptionDialog(this, "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
+        int choix = JOptionPane.showOptionDialog(this, titre_ic + "\n" + t_nom_ic + "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
         
         switch (choix) {
             case 0:
@@ -347,12 +350,28 @@ public class MaFenetre extends JFrame {
             }
         });
         
-        view.addMouseListener(new MouseAdapter() {
-        @Override
-            public void mousePressed(MouseEvent e) {
-                popup_infos_centre();
+       
+        
+     view.addMouseListener(new MouseAdapter() {
+    @Override
+    public void mousePressed(MouseEvent e) {
+        
+        GraphicsConfiguration gc = view.getGraphicsConfiguration();
+        AffineTransform tx = gc.getDefaultTransform();
+ 
+        float abscisse = (float) (e.getX()*tx.getScaleX());
+        float ordonnee = (float) (e.getY()*tx.getScaleY());
+        
+        GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
+        System.out.println(element);
+        if (element != null) {
+            Node n = grapheActuel.getNode(element.getId());
+            if (n != null) {
+                popup_infos_centre(n);
             }
-        });
+        }
+    }
+});
    
         
         //Nouveau trajet 
