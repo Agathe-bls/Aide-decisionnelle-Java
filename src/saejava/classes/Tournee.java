@@ -165,7 +165,7 @@ public class Tournee {
 
     // pour debugger et afficher
     public void afficherTournee(int vehiculeChosi) {
-        System.out.println("===== Tournee du véhicule =====");
+        System.out.println("===== Tournee du véhicule " + vehiculeChosi + " =====");
 
         if (lstVehicules.get(vehiculeChosi).trajets.isEmpty()) {
             System.out.println("Aucun trajet calculé.");
@@ -178,11 +178,11 @@ public class Tournee {
             System.out.println("- " + n.getId() + " (" + n.getAttribute("type") + ")");
         }
 
-        System.out.println("\nTrajets :");
-
-        for (Chemin c : lstVehicules.get(vehiculeChosi).trajets) {
-            System.out.println(c);
-        }
+//        System.out.println("\nTrajets :");
+//
+//        for (Chemin c : lstVehicules.get(vehiculeChosi).trajets) {
+//            System.out.println(c);
+//        }
 
         System.out.println("\nDurée totale : " + lstVehicules.get(vehiculeChosi).dureeTotale + " min");
     }

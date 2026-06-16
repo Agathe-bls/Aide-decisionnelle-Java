@@ -21,7 +21,7 @@ public class Chemin {
     private double fiabiliteTotale;
     private int distanceTotale;
     private int dureeTotale;
-    private double dureeEstimee;    //avec la fiabilité
+    private int dureeEstimee;    //avec la fiabilité
     private ArrayList<Node> centresTraverses;
     private ArrayList<Edge> routesTraversees;
 
@@ -104,7 +104,7 @@ public class Chemin {
             this.routesTraversees.add(entreDeux);
             this.distanceTotale += (Integer) (entreDeux.getAttribute("distance"));
             this.fiabiliteTotale += (Double) (entreDeux.getAttribute("fiabilite"));
-            this.dureeEstimee += (Double) (entreDeux.getAttribute("duree")) * (20 - (double) (entreDeux.getAttribute("fiabilite"))) / 10;
+            this.dureeEstimee += ((int) (entreDeux.getAttribute("duree")) * (20 - (double) (entreDeux.getAttribute("fiabilite"))) / 10);
 
             debut = (infosTableauDijkstra.get(debut).centrePrecedent);
         }
@@ -131,7 +131,7 @@ public class Chemin {
                         infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
                         infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
                     }
-                }
+                }                
             }
             infosTableauDijkstra.get(nTraite).estTraite = true;
         }
@@ -156,6 +156,7 @@ public class Chemin {
 
     //LES FONCTIONS SECONDAIRES UTILISEES POUR L'ALGO :
     public class InfosCentresDijkstra {
+
         private double coutCalcule;
         private Node centrePrecedent;
         private boolean estTraite;
@@ -165,7 +166,7 @@ public class Chemin {
         this.fiabiliteTotale = 0.0;
         this.distanceTotale = 0;
         this.dureeTotale = 0;
-        this.dureeEstimee = 0.0;
+        this.dureeEstimee = 0;
         this.centresTraverses.clear();
         this.routesTraversees.clear();
 
