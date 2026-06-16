@@ -13,11 +13,13 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
@@ -29,6 +31,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -101,6 +105,7 @@ public class MaFenetre extends JFrame {
     //popup info centre
     private JLabel titre_ic;
     private JLabel t_nom_ic;
+    private ArrayList donnee;
     
     
   
@@ -279,40 +284,56 @@ public class MaFenetre extends JFrame {
         this.pack();
         this.setContentPane(pPrincipal);
     }
+
+
+private void table_centre_km(Node n) {
+    // 1. Utilisation de la bonne liste (déjà présente dans ton code de départ)
+    ArrayList<Object[]> listeDonnees = new ArrayList<>();
+    
+    // 2. On parcourt les nœuds en utilisant 'this' (puisque ta classe EST le graphe)
+    for (Node noeud : grapheActuel.getEachNode()) {
+        Edge arete = noeud.getEdgeBetween(n);
+        Object distance = null;
+        
+        if (noeud.equals(n)) {
+            distance = 0;
+        } else if (arete != null) {
+            distance = chemin.cheminDureeMinDijkstra(n, noeud);
+        }
+        
+        //Ajout des données
+        listeDonnees.add(new Object[]{noeud.getId(), distance});
+    }
+    
+    // 3. Correction des titres (séparés par une virgule pour faire 2 colonnes)
+    String[] titre = {"Id", "Distance"};
+    
+    // 4. Conversion en tableau de données
+    Object[][] donnee = listeDonnees.toArray(new Object[listeDonnees.size()][]);
+    
+    // 5. CRÉATION DE LA FENÊTRE POUR QUE ÇA S'AFFICHE
+    JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
+    JTable tableau = new JTable(donnee, titre);
+    
+    // On ajoute le JScrollPane à notre NOUVELLE fenêtre
+    fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+    
+    // On dimensionne et on affiche la fenêtre
+    fenetreTableau.pack();
+    fenetreTableau.setLocationRelativeTo(null); // Centre l'affichage sur ton écran
+    fenetreTableau.setVisible(true);
+}
     
     private void popup_infos_centre(Node n){
-        JLabel titre_ic = new JLabel("Id :" + n.getId());
+        JLabel titre_ic = new JLabel("ID :" + n.getId());
         JLabel t_nom_ic = new JLabel("Type de centre : " + grapheActuel.getTypeComplet(n));
         
         String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
-        int choix = JOptionPane.showOptionDialog(this, titre_ic + "\n" + t_nom_ic + "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
+        int choix = JOptionPane.showOptionDialog(this, "Id : " + n.getId() + "\nType de centre : " + grapheActuel.getTypeComplet(n) + "\nQuelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
         
         switch (choix) {
             case 0:
-                String choixDepart  = JOptionPane.showInputDialog( null, "De quel centre voulez vous partir", "Choix du départ du chemin", JOptionPane.QUESTION_MESSAGE) ;
-                String choixArrivee  = JOptionPane.showInputDialog( null, "A quel centre voulez vous arriver", "Choix de l'arrivée du chemin", JOptionPane.QUESTION_MESSAGE) ;
-                Node depart = grapheActuel.getNode(choixDepart.toUpperCase());
-                Node arrivee = grapheActuel.getNode(choixArrivee.toUpperCase());
-                
-                String[] optionsCh = {"Chemin le plus rapide", "Chemin rapide et fiable", "Annuler"};
-                int choixCh = JOptionPane.showOptionDialog(this, "Quel type de chemin voulez-vous ?", "Choix du chemin", 0, JOptionPane.QUESTION_MESSAGE, null, optionsCh, optionsCh[2]);
-                switch (choixCh) {
-                    case 0:
-                        chemin.cheminDureeMinDijkstra(depart, arrivee);
-                        chemin.visualisationChemin("dureeMin");
-                        coutEtTrajet.setForeground(Color.RED);
-                        coutEtTrajet.setText("Durée : " + chemin.getDureeTotale() + " min. " + chemin.getCentresTraverses());
-                        break;
-                    case 1:
-                        chemin.cheminDureeEstimeeDijkstra(depart, arrivee);
-                        chemin.visualisationChemin("dureeEstimee");
-                        coutEtTrajet.setForeground(Color.GREEN);
-                        coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
-                        break;
-                    default:
-                        throw new AssertionError();
-                        //FAIRE UNE EXCEPTION POUR DIRE QUE LES CHEMINS DE D2PART ET ARRIVEES N4EXISTENT PAS OU AUTRE ERREURS
-                }
+               table_centre_km(n);
                 break;
 
             case 1:

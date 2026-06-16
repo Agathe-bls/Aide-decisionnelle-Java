@@ -28,13 +28,13 @@ public class MonGraphe extends SingleGraph {
     public String getTypeComplet(Node centre) {
         String res = "";
         if (centre.getAttribute("type").equals("M")) {
-            res = "Maternite";
+            res = "Maternité";
         } else if (centre.getAttribute("type").equals("O")) {
-            res = "Bloc operatoire";
+            res = "Bloc opératoire";
         } else if (centre.getAttribute("type").equals("N")) {
             res = "Nutrition";
         } else {
-            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT À CA
         }
         return res;
     }
