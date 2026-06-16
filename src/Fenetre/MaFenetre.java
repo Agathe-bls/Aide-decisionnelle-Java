@@ -106,14 +106,11 @@ public class MaFenetre extends JFrame {
     private JLabel titre_ic;
     private JLabel t_nom_ic;
     private ArrayList donnee;
-    
-    
-  
+
     
     public MaFenetre(){
         super("MedicOne");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(1500,800));
         this.pack();
         this.setLocationRelativeTo(null);
         
@@ -124,6 +121,7 @@ public class MaFenetre extends JFrame {
         visuSeuil();
         gererTailleTextes();
         
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
     }
     
@@ -262,7 +260,6 @@ public class MaFenetre extends JFrame {
         pMap.add(coutEtTrajet, BorderLayout.SOUTH);
         
         pPrincipal.add(pMap,BorderLayout.CENTER);
-        
         
         
               
@@ -454,6 +451,7 @@ private void table_centre_km(Node n) {
     }
     
     private void popup_nouv_t(){
+        intervention.setText("0 véhicules en tournée");
         coutEtTrajet.setText("");
         chemin.clearVisualisations();
         String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
@@ -490,7 +488,6 @@ private void table_centre_km(Node n) {
             case 1:
                 String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
                 int NbV = Integer.parseInt(choixNbV);
-                
                 switch (NbV) {
                     case 1:
                         String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
@@ -524,12 +521,12 @@ private void table_centre_km(Node n) {
                         coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
                         tournee2V.afficherTournee(0);
                         tournee2V.afficherTournee(1);
-                        
                         break;
                     default:
                         throw new AssertionError();
                         //FAIRE UNE EXCEPTION PAR RAPPORT AU NB CE V2HICULES OU AUTRE ERREURS
-                } break;
+                }
+                intervention.setText(choixNbV + " véhicules en tournée"); break;
 
             case 2:break;
                 
