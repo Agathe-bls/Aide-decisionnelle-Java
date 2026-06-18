@@ -4,12 +4,16 @@
  */
 package Fenetre;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.graphstream.graph.Node;
 import saejava.classes.MonGraphe;
 
@@ -53,8 +57,6 @@ public class PopupInfosCentres {
                 //JE PENSE QUE CA SUFFIT DE JUSTE SORTIR PARCE QUE ON PEUT QUE CLIQUER DANS LA CROIX SINON ET CROIX = -1
         }
     }
-    
-    
     
     private void centre_proche(Node n) {
         ArrayList<ArrayList<Object[]>> resultatTri = grapheActuel.tri_centre_duree(n);
@@ -131,11 +133,95 @@ public class PopupInfosCentres {
         fenetreTableau.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JTable tableau = new JTable(donnee, titre);
-        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+        
+        //Ajout de couleurs
+        tableau.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value,
+                    boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                Component composant = super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+                
+                composant.setBackground(Color.WHITE);
+                
+                switch (row) {
+                    case 0:
+                        composant.setBackground(Color.decode("#FA8FF1"));
+                        break;
+                    case 1:
+                        composant.setBackground(Color.decode("#93FA8F"));
+                        break;
+                    case 2:
+                        composant.setBackground(Color.decode("#8FB6FA"));
+                        break;
+                    default:
+                        break;
+                }
+                return composant;
+            }
+        });
 
+        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+        System.out.println("AAAAAAAAAAAAAAAA : " + tableau.getRowHeight());
+        System.out.println("AAAAAAAAAAAAAAAA : " + listeProches.size());
+        System.out.println("AAAAAAAAAAAAAAAA : " + listeProches.size() * tableau.getRowHeight() * 10);
+        fenetreTableau.setPreferredSize(new Dimension(700, listeProches.size() * tableau.getRowHeight()));
+        fenetreTableau.pack();
+        
+        fenetreTableau.setLocationRelativeTo(null);
+        fenetreTableau.setVisible(true);
+        
+    }
+    
+    private void table_centre_km(Node n) {
+        
+         //Initialisation de la liste de liste (fonction tri_centre)
+         ArrayList<ArrayList<Object[]>> resultatTri;
+         resultatTri = grapheActuel.tri_centre_distance(n);
+
+         //Liste Finale
+         ArrayList<Object[]> listeDonnees = new ArrayList<>();
+
+         //Sous-liste
+         ArrayList<Object[]> listeMat   = resultatTri.get(0);
+         ArrayList<Object[]> listeNutri = resultatTri.get(1); 
+         ArrayList<Object[]> listeBo    = resultatTri.get(2);
+
+         //Maternité
+         if (!listeMat.isEmpty()) {
+             listeDonnees.add(new Object[]{"Distances aux maternités", "", ""});
+             listeDonnees.addAll(listeMat);
+         }
+
+        //Nutrition
+        if (!listeNutri.isEmpty()) {
+            listeDonnees.add(new Object[]{"Distances aux nutrition", "", ""});
+            listeDonnees.addAll(listeNutri);
+        }
+
+        //Bloc Opératoire
+        if (!listeBo.isEmpty()) {
+            listeDonnees.add(new Object[]{"Distances aux blocs opératoires", "", ""}); 
+            listeDonnees.addAll(listeBo);
+        }
+
+        //Ajout des données dans le tableau
+        String[] titre = {"Centre", "Id", "Distance (km)"};
+        Object[][] donnee = listeDonnees.toArray(new Object[listeDonnees.size()][]);
+
+        //Affichage
+        JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
+        JTable tableau = new JTable(donnee, titre);
+        
+        AfficheCouleursPlusieursLignes(tableau);
+        
+        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
         fenetreTableau.pack();
         fenetreTableau.setLocationRelativeTo(null);
         fenetreTableau.setVisible(true);
+        
     }
 
     private void table_centre_duree(Node n) {
@@ -176,54 +262,40 @@ public class PopupInfosCentres {
         //Affichage
         JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
         JTable tableau = new JTable(donnee, titre);
+        
+        AfficheCouleursPlusieursLignes(tableau);
+        
         fenetreTableau.getContentPane().add(new JScrollPane(tableau));
         fenetreTableau.pack();
         fenetreTableau.setLocationRelativeTo(null);
         fenetreTableau.setVisible(true);
     }
     
-    
-    private void table_centre_km(Node n) {
-         //Initialisation de la liste de liste (fonction tri_centre)
-         ArrayList<ArrayList<Object[]>> resultatTri;
-         resultatTri = grapheActuel.tri_centre_distance(n);
+    private void AfficheCouleursPlusieursLignes(JTable tableau) {
+        tableau.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value,
+                    boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                Component composant = super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
 
-         //Liste Finale
-         ArrayList<Object[]> listeDonnees = new ArrayList<>();
+                composant.setBackground(Color.decode("#d4e3fd"));
 
-         //Sous-liste
-         ArrayList<Object[]> listeMat   = resultatTri.get(0);
-         ArrayList<Object[]> listeNutri = resultatTri.get(1); 
-         ArrayList<Object[]> listeBo    = resultatTri.get(2);
-
-         //Maternité
-         if (!listeMat.isEmpty()) {
-             listeDonnees.add(new Object[]{"Distances aux maternités", "", ""});
-             listeDonnees.addAll(listeMat);
-         }
-
-        //Nutrition
-        if (!listeNutri.isEmpty()) {
-            listeDonnees.add(new Object[]{"Distances aux nutrition", "", ""});
-            listeDonnees.addAll(listeNutri);
-        }
-
-        //Bloc Opératoire
-        if (!listeBo.isEmpty()) {
-            listeDonnees.add(new Object[]{"Distances aux blocs opératoires", "", ""}); 
-            listeDonnees.addAll(listeBo);
-        }
-
-        //Ajout des données dans le tableau
-        String[] titre = {"Centre", "Id", "Distance (km)"};
-        Object[][] donnee = listeDonnees.toArray(new Object[listeDonnees.size()][]);
-
-        //Affichage
-        JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
-        JTable tableau = new JTable(donnee, titre);
-        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
-        fenetreTableau.pack();
-        fenetreTableau.setLocationRelativeTo(null);
-        fenetreTableau.setVisible(true);
+                if (row == 0) {
+                    composant.setBackground(Color.decode("#FA8FF1"));
+                } else if (row > 0 && row < 1 + fenetreActuelle.nbCentresParType()[1]) {
+                    composant.setBackground(Color.decode("#fcc7f7"));
+                } else if (row == 1 + fenetreActuelle.nbCentresParType()[1]) {
+                    composant.setBackground(Color.decode("#93fa8f"));
+                } else if (row > 1 + fenetreActuelle.nbCentresParType()[1] && row < 2 + fenetreActuelle.nbCentresParType()[1] + fenetreActuelle.nbCentresParType()[0]) {
+                    composant.setBackground(Color.decode("#c9fcc7"));
+                } else if (row == 2 + fenetreActuelle.nbCentresParType()[1] + fenetreActuelle.nbCentresParType()[0]) {
+                    composant.setBackground(Color.decode("#8FB6FA"));
+                }
+                return composant;
+            }
+        });
     }
 }

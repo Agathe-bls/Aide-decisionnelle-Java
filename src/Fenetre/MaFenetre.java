@@ -18,7 +18,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
-import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
@@ -30,8 +29,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -103,9 +100,6 @@ public class MaFenetre extends JFrame {
     
     //popup info centre
     private PopupInfosCentres popupInfoC;
-    private JLabel titre_ic;
-    private JLabel t_nom_ic;
-    private ArrayList donnee;
 
     
     public MaFenetre(){
@@ -444,7 +438,7 @@ public class MaFenetre extends JFrame {
                         String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
                         int TypeCentres  = JOptionPane.showOptionDialog(this, "Quel type de centre voulez vous dans votre tournée?", "Choix du type des centres de la tournée", 0, JOptionPane.QUESTION_MESSAGE, null, choixTypeCentres, choixTypeCentres[3]) ;
                         
-                        String type = null;
+                        String type;
                         switch(TypeCentres){
                             case 0 : type = "N"; break;
                             case 1 : type = "M"; break;
@@ -482,7 +476,8 @@ public class MaFenetre extends JFrame {
             case 2:break;
                 
             default:
-                throw new IllegalStateException("Unexpected value: " + choix);
+                break;
+//                throw new IllegalStateException("Unexpected value: " + choix);
                 //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT IL FAUT PEUT ETRE METTRE UN DEFAULT EXIT OU JS QUOI
         }
     }
@@ -495,16 +490,17 @@ public class MaFenetre extends JFrame {
         testGraphPresent();
         coutEtTrajet.setText("");
         grapheActuel.visualisationGraphe();
-        nbCentresParType();
+        labelCentresParType();
         
         seuil_test.setValue(0.2);
     }
     
-    private void nbCentresParType(){
+    public int[] nbCentresParType(){
         /**
          * 
          * @author Agathe
          */
+        int[] tabNbParTypes = new int[3];
         int nu = 0, m = 0, o = 0;
         for(Node n : grapheActuel.getEachNode()){
             if(n.getAttribute("type").equals("N"))
@@ -516,9 +512,22 @@ public class MaFenetre extends JFrame {
             else
                 throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
         }
-        nbr_bo.setText("" + o);
-        nbr_m.setText("" + m);
-        nbr_n.setText("" +  nu); 
+        
+        tabNbParTypes[0] = nu;
+        tabNbParTypes[1] = m;
+        tabNbParTypes[2] = o;
+        return tabNbParTypes;
+    }
+    
+    private void labelCentresParType(){
+        /**
+         * 
+         * @author Agathe
+         */
+        
+        nbr_bo.setText("" + nbCentresParType()[2]);
+        nbr_m.setText("" + nbCentresParType()[1]);
+        nbr_n.setText("" +  nbCentresParType()[0]); 
     }
     
     private void testGraphPresent() {
