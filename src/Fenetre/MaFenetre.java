@@ -13,7 +13,6 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -158,7 +157,13 @@ public class MaFenetre extends JFrame {
         menuBar.add(menuSeuil);
     }
     
+    
     private void initComposants(){
+        /**
+         * 
+         * @author Auryann / Agathe
+         */
+                
         JPanel pPrincipal = new JPanel(new BorderLayout());
         
         //Partie Haut Nouvelle-map
@@ -281,45 +286,176 @@ public class MaFenetre extends JFrame {
         this.pack();
         this.setContentPane(pPrincipal);
     }
-
-
-private void table_centre_km(Node n) {
-    // 1. Utilisation de la bonne liste (déjà présente dans ton code de départ)
-    ArrayList<Object[]> listeDonnees = new ArrayList<>();
     
-    // 2. On parcourt les nœuds en utilisant 'this' (puisque ta classe EST le graphe)
-    for (Node noeud : grapheActuel.getEachNode()) {
-        Edge arete = noeud.getEdgeBetween(n);
-        Object distance = null;
-        
-        if (noeud.equals(n)) {
-            distance = 0;
-        } else if (arete != null) {
-            distance = chemin.cheminDureeMinDijkstra(n, noeud);
+    private void table_centre_km(Node n) {
+         //Initialisation de la liste de liste (fonction tri_centre)
+         ArrayList<ArrayList<Object[]>> resultatTri;
+         resultatTri = grapheActuel.tri_centre_distance(n);
+
+         //Liste Finale
+         ArrayList<Object[]> listeDonnees = new ArrayList<>();
+
+         //Sous-liste
+         ArrayList<Object[]> listeMat   = resultatTri.get(0);
+         ArrayList<Object[]> listeNutri = resultatTri.get(1); 
+         ArrayList<Object[]> listeBo    = resultatTri.get(2);
+
+         //Maternité
+         if (!listeMat.isEmpty()) {
+             listeDonnees.add(new Object[]{"Distances aux maternités", "", ""});
+             listeDonnees.addAll(listeMat);
+         }
+
+        //Nutrition
+        if (!listeNutri.isEmpty()) {
+            listeDonnees.add(new Object[]{"Distances aux nutrition", "", ""});
+            listeDonnees.addAll(listeNutri);
         }
-        
-        //Ajout des données
-        listeDonnees.add(new Object[]{noeud.getId(), distance});
+
+        //Bloc Opératoire
+        if (!listeBo.isEmpty()) {
+            listeDonnees.add(new Object[]{"Distances aux blocs opératoires", "", ""}); 
+            listeDonnees.addAll(listeBo);
+        }
+
+        //Ajout des données dans le tableau
+        String[] titre = {"Centre", "Id", "Distance (km)"};
+        Object[][] donnee = listeDonnees.toArray(new Object[listeDonnees.size()][]);
+
+        //Affichage
+        JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
+        JTable tableau = new JTable(donnee, titre);
+        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+        fenetreTableau.pack();
+        fenetreTableau.setLocationRelativeTo(null);
+        fenetreTableau.setVisible(true);
     }
-    
-    // 3. Correction des titres (séparés par une virgule pour faire 2 colonnes)
-    String[] titre = {"Id", "Distance"};
-    
-    // 4. Conversion en tableau de données
-    Object[][] donnee = listeDonnees.toArray(new Object[listeDonnees.size()][]);
-    
-    // 5. CRÉATION DE LA FENÊTRE POUR QUE ÇA S'AFFICHE
-    JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
-    JTable tableau = new JTable(donnee, titre);
-    
-    // On ajoute le JScrollPane à notre NOUVELLE fenêtre
-    fenetreTableau.getContentPane().add(new JScrollPane(tableau));
-    
-    // On dimensionne et on affiche la fenêtre
-    fenetreTableau.pack();
-    fenetreTableau.setLocationRelativeTo(null); // Centre l'affichage sur ton écran
-    fenetreTableau.setVisible(true);
-}
+
+    private void centre_proche(Node n) {
+        ArrayList<ArrayList<Object[]>> resultatTri = grapheActuel.tri_centre_duree(n);
+
+        // Initialisation des sous-listes
+        ArrayList<Object[]> listeMat   = resultatTri.get(0);
+        ArrayList<Object[]> listeNutri = resultatTri.get(1); 
+        ArrayList<Object[]> listeBo    = resultatTri.get(2);
+
+        // Tri des listes par durée totale croissante
+        listeMat.sort(java.util.Comparator.comparing(ligne -> (Integer) ligne[2]));
+        listeNutri.sort(java.util.Comparator.comparing(ligne -> (Integer) ligne[2]));
+        listeBo.sort(java.util.Comparator.comparing(ligne -> (Integer) ligne[2]));
+
+        //Titre des colonnes
+        String[] titre = {"Centre", "Id", "Durée Totale (min)", "Durée Estimée (min)"};
+
+        //Liste Finale
+        ArrayList<Object[]> listeProches = new ArrayList<>();
+
+        //Maternité
+        if (!listeMat.isEmpty()) {
+            Object[] plusProcheMat = listeMat.get(0);
+            if (n.getId().equals(plusProcheMat[1])) {
+                plusProcheMat = (listeMat.size() > 1) ? listeMat.get(1) : null;
+            }
+
+            if (plusProcheMat != null) {
+                listeProches.add(new Object[]{"Maternité la plus proche", plusProcheMat[1], plusProcheMat[2], plusProcheMat[3]});
+            } else {
+                listeProches.add(new Object[]{"Maternité la plus proche", "Aucune autre", "", ""});
+            }
+        } else {
+            listeProches.add(new Object[]{"Maternité la plus proche", "Aucune", "", ""});
+        }
+
+        // Nutrition
+        if (!listeNutri.isEmpty()) {
+            Object[] plusProcheNutri = listeNutri.get(0);
+            if (n.getId().equals(plusProcheNutri[1])) {
+                plusProcheNutri = (listeNutri.size() > 1) ? listeNutri.get(1) : null;
+            }
+
+            if (plusProcheNutri != null) {
+                listeProches.add(new Object[]{"Nutrition la plus proche", plusProcheNutri[1], plusProcheNutri[2], plusProcheNutri[3]});
+            } else {
+                listeProches.add(new Object[]{"Nutrition la plus proche", "Aucun autre", "", ""});
+            }
+        } else {
+            listeProches.add(new Object[]{"Nutrition la plus proche", "Aucune", "", ""});
+        }
+
+        //Bloc Opératoire
+        if (!listeBo.isEmpty()) {
+            Object[] plusProcheBo = listeBo.get(0);
+            if (n.getId().equals(plusProcheBo[1])) {
+                plusProcheBo = (listeBo.size() > 1) ? listeBo.get(1) : null;
+            }
+
+            if (plusProcheBo != null) {
+                listeProches.add(new Object[]{"Bloc opératoire le plus proche", plusProcheBo[1], plusProcheBo[2], plusProcheBo[3]});
+            } else {
+                listeProches.add(new Object[]{"Bloc opératoire le plus proche", "Aucun autre", "", ""});
+            }
+        } else {
+            listeProches.add(new Object[]{"Bloc opératoire le plus proche", "Aucun", "", ""});
+        }
+
+        //Conversion des listes en objet pour le tableau 
+        Object[][] donnee = listeProches.toArray(new Object[listeProches.size()][]);
+
+        // Affichage Graphique
+        JFrame fenetreTableau = new JFrame("Centres les plus proches de " + n.getId());
+        fenetreTableau.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JTable tableau = new JTable(donnee, titre);
+        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+
+        fenetreTableau.pack();
+        fenetreTableau.setLocationRelativeTo(null);
+        fenetreTableau.setVisible(true);
+    }
+
+    private void table_centre_duree(Node n) {
+         //Initialisation de la liste de liste (fonction tri_centre)
+         ArrayList<ArrayList<Object[]>> resultatTri;
+         resultatTri = grapheActuel.tri_centre_duree(n);
+
+         //Liste Finale
+         ArrayList<Object[]> listeDonnees = new ArrayList<>();
+
+         //Sous-liste
+         ArrayList<Object[]> listeMat   = resultatTri.get(0);
+         ArrayList<Object[]> listeNutri = resultatTri.get(1); 
+         ArrayList<Object[]> listeBo    = resultatTri.get(2);
+
+         //Maternité
+         if (!listeMat.isEmpty()) {
+             listeDonnees.add(new Object[]{"Distances aux maternités", "", ""});
+             listeDonnees.addAll(listeMat);
+         }
+
+        //Nutrition
+        if (!listeNutri.isEmpty()) {
+            listeDonnees.add(new Object[]{"Distances aux nutrition", "", ""});
+            listeDonnees.addAll(listeNutri);
+        }
+
+        //Bloc Opératoire
+        if (!listeBo.isEmpty()) {
+            listeDonnees.add(new Object[]{"Distances aux blocs opératoires", "", ""}); 
+            listeDonnees.addAll(listeBo);
+        }
+
+        //Ajout des données dans le tableau
+        String[] titre = {"Centre", "Id", "Durée (min)"};
+        Object[][] donnee = listeDonnees.toArray(new Object[listeDonnees.size()][]);
+
+        //Affichage
+        JFrame fenetreTableau = new JFrame("Distances depuis " + n.getId());
+        JTable tableau = new JTable(donnee, titre);
+        fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+        fenetreTableau.pack();
+        fenetreTableau.setLocationRelativeTo(null);
+        fenetreTableau.setVisible(true);
+    }
     
     private void popup_infos_centre(Node n){
         JLabel titre_ic = new JLabel("ID :" + n.getId());
@@ -330,26 +466,16 @@ private void table_centre_km(Node n) {
         
         switch (choix) {
             case 0:
-               table_centre_km(n);
+               centre_proche(n);
                 break;
 
             case 1:
-                String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
-                int NbV = Integer.parseInt(choixNbV);
-                
-                switch (NbV) {
-                    case 1:
-                        System.out.println("On a pas encore cette possibilité");
-                        break;
-                    case 2:
-                        System.out.println("On a pas encore cette possibilité");
-                        break;
-                    default:
-                        throw new AssertionError();
-                        //FAIRE UNE EXCEPTION PAR RAPPORT AU NB CE V2HICULES OU AUTRE ERREURS
-                } break;
+                table_centre_km(n);
+                break;
 
-            case 2:break;
+            case 2:
+                table_centre_duree(n);
+                break;
                 
             default:
                 throw new IllegalStateException("Unexpected value: " + choix);
@@ -359,6 +485,10 @@ private void table_centre_km(Node n) {
     
      
     private void initEcouteurs() {
+        /**
+         * 
+         * @author Auryann / Agathe
+         */
         //Partie Haut
         btNouvelle_map.addActionListener((ActionEvent e) -> {
             try {
@@ -370,22 +500,23 @@ private void table_centre_km(Node n) {
         
        
         
-     view.addMouseListener(new MouseAdapter() {
+    view.addMouseListener(new MouseAdapter() {
     @Override
     public void mousePressed(MouseEvent e) {
-        
-        GraphicsConfiguration gc = view.getGraphicsConfiguration();
-        AffineTransform tx = gc.getDefaultTransform();
- 
-        float abscisse = (float) (e.getX()*tx.getScaleX());
-        float ordonnee = (float) (e.getY()*tx.getScaleY());
-        
-        GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
-        System.out.println(element);
-        if (element != null) {
-            Node n = grapheActuel.getNode(element.getId());
-            if (n != null) {
-                popup_infos_centre(n);
+        if (javax.swing.SwingUtilities.isRightMouseButton(e)) {
+            GraphicsConfiguration gc = view.getGraphicsConfiguration();
+            AffineTransform tx = gc.getDefaultTransform();
+
+            float abscisse = (float) (e.getX()*tx.getScaleX());
+            float ordonnee = (float) (e.getY()*tx.getScaleY());
+
+            GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
+            System.out.println(element);
+            if (element != null) {
+                Node n = grapheActuel.getNode(element.getId());
+                if (n != null) {
+                    popup_infos_centre(n);
+                }
             }
         }
     }
@@ -416,6 +547,10 @@ private void table_centre_km(Node n) {
     }
     
     private void popup_nouv_district() throws IOException{
+        /**
+         * 
+         * @author Agathe
+         */
         String[] options = {"Import", "Création aléatoire", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Comment voulez vous créer votre nouveau district ?", "Choix du district", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         switch (choix) {
@@ -451,6 +586,10 @@ private void table_centre_km(Node n) {
     }
     
     private void popup_nouv_t(){
+        /**
+         * 
+         * @author Agathe
+         */
         intervention.setText("0 véhicules en tournée");
         coutEtTrajet.setText("");
         chemin.clearVisualisations();
@@ -537,6 +676,10 @@ private void table_centre_km(Node n) {
     }
     
     private void recharger_infos(){
+        /**
+         * 
+         * @author Agathe
+         */
         testGraphPresent();
         coutEtTrajet.setText("");
         grapheActuel.visualisationGraphe();
@@ -546,6 +689,10 @@ private void table_centre_km(Node n) {
     }
     
     private void nbCentresParType(){
+        /**
+         * 
+         * @author Agathe
+         */
         int nu = 0, m = 0, o = 0;
         for(Node n : grapheActuel.getEachNode()){
             if(n.getAttribute("type").equals("N"))
@@ -563,6 +710,10 @@ private void table_centre_km(Node n) {
     }
     
     private void testGraphPresent() {
+        /**
+         * 
+         * @author Agathe
+         */
         if (grapheActuel.getEstVide() == true) {
             btNouveau_trajet.setEnabled(false);
             checkFia.setEnabled(false);
@@ -583,6 +734,10 @@ private void table_centre_km(Node n) {
     }
     
     private void labelCheckRoutes(){
+        /**
+         * 
+         * @author Agathe
+         */
         for (Edge route : grapheActuel.getEachEdge()) {
             String label = "";
 
@@ -614,6 +769,10 @@ private void table_centre_km(Node n) {
     }
     
     private void labelCheckUneRoute(Edge route){
+        /**
+         * 
+         * @author Agathe
+         */
             String label = "";
 
             if (checkFia.isSelected()) {
@@ -642,6 +801,10 @@ private void table_centre_km(Node n) {
     }
     
     private void labelCheckCentres(){
+        /**
+         * 
+         * @author Agathe
+         */
         for(Node centre : grapheActuel.getEachNode()){
             String label = "";
             
@@ -659,6 +822,9 @@ private void table_centre_km(Node n) {
     }
     
     private void visuSeuil() {
+        /** 
+         * @author Agathe
+         */
         seuil_test.addChangeListener((ChangeEvent e) -> {
             for (Edge route : grapheActuel.getEachEdge()) {
                 double fiaRoute = (route.getAttribute("fiabilite"));
@@ -676,6 +842,9 @@ private void table_centre_km(Node n) {
     }
     
     private JPanel InfosCouleursCentres(int type){
+        /** 
+         * @author Agathe
+         */
         JPanel couleur = new JPanel();
         switch(type){
             case 0 : couleur.setBackground(Color.decode("#93FA8F")); break;
@@ -689,6 +858,9 @@ private void table_centre_km(Node n) {
     }
     
     private void gererTailleTextes(){
+        /** 
+         * @author Agathe
+         */
         Font police = new Font("Arial", Font.ROMAN_BASELINE, 16);
         Font policeTitre = new Font("Arial", Font.BOLD, 17);
         //Partie Haut Nouvelle-map

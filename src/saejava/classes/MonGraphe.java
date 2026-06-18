@@ -12,6 +12,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import java.util.random.RandomGenerator;
 
+
 public class MonGraphe extends SingleGraph {
 
     private boolean estVide;
@@ -188,4 +189,90 @@ public class MonGraphe extends SingleGraph {
             e.addAttribute("ui.style", "text-size: 20px;");
         }
     }
+    
+    public ArrayList<ArrayList<Object[]>> tri_centre_distance(Node n) {
+        //Initialisation des variables locales
+        Chemin algoChemin = new Chemin(this);
+        ArrayList<Object[]> listeMat = new ArrayList<>();
+        ArrayList<Object[]> listeNutri = new ArrayList<>();
+        ArrayList<Object[]> listeBo = new ArrayList<>();
+
+        //Parcours des noeuds
+        for (Node noeud : this.getEachNode()) {
+            String type = this.getTypeComplet(noeud);
+
+            if ("Maternité".equals(type) || "Nutrition".equals(type) || "Bloc opératoire".equals(type)) {
+                Object distance;
+                if (noeud.equals(n)) {
+                    distance = 0;
+                } else {
+                    distance = algoChemin.cheminDureeMinDijkstra(n, noeud).getDistanceTotale();
+                }
+
+                Object[] donneesNoeud = new Object[]{"", noeud.getId(), distance};
+
+                //Tri par type
+                if ("Maternité".equals(type)) {
+                    listeMat.add(donneesNoeud);
+                } else if ("Nutrition".equals(type)) {
+                    listeNutri.add(donneesNoeud);
+                } else if ("Bloc opératoire".equals(type)) {
+                    listeBo.add(donneesNoeud);
+                }
+            }
+        }
+
+        //Ajout des sous-listes dans la liste principale
+        ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
+        listeResultat.add(listeMat);  
+        listeResultat.add(listeNutri); 
+        listeResultat.add(listeBo);    
+
+        return listeResultat;
+    }
+    
+    public ArrayList<ArrayList<Object[]>> tri_centre_duree(Node n) {
+        //Initialisation des variables locales
+        Chemin algoChemin = new Chemin(this);
+        ArrayList<Object[]> listeMat = new ArrayList<>();
+        ArrayList<Object[]> listeNutri = new ArrayList<>();
+        ArrayList<Object[]> listeBo = new ArrayList<>();
+
+        //Parcours des noeuds
+        for (Node noeud : this.getEachNode()) {
+            String type = this.getTypeComplet(noeud);
+
+            if ("Maternité".equals(type) || "Nutrition".equals(type) || "Bloc opératoire".equals(type)) {
+                Object dureeT;
+                Object dureeE;
+                if (noeud.equals(n)) {
+                    dureeT = 0;
+                    dureeE = 0;
+                } else {
+                    dureeT = algoChemin.cheminDureeMinDijkstra(n, noeud).getDureeTotale();
+                    dureeE = algoChemin.cheminDureeMinDijkstra(n, noeud).getDureeEstimee();
+                }
+
+                Object[] donneesNoeud = new Object[]{"", noeud.getId(), dureeT, dureeE};
+
+                //Tri par type
+                if ("Maternité".equals(type)) {
+                    listeMat.add(donneesNoeud);
+                } else if ("Nutrition".equals(type)) {
+                    listeNutri.add(donneesNoeud);
+                } else if ("Bloc opératoire".equals(type)) {
+                    listeBo.add(donneesNoeud);
+                }
+            }
+        }
+
+        //Ajout des sous-listes dans la liste principale
+        ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
+        listeResultat.add(listeMat);  
+        listeResultat.add(listeNutri); 
+        listeResultat.add(listeBo);    
+
+        return listeResultat;
+    }
 }
+
