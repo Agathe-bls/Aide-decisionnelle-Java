@@ -764,7 +764,7 @@ public class MaFenetre extends JFrame {
             } else {
                 route.addAttribute("ui.label", label);
             }
-            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
+            route.addAttribute("ui.style", "text-size: 15;");       //LALIGNEMENT NE MARCHE PAS 
         }
     }
     
@@ -792,12 +792,9 @@ public class MaFenetre extends JFrame {
                 }
                 label += route.getAttribute("distance") + " km";
             }
-
             
-                route.addAttribute("ui.label", label);
-            
-            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
-        
+            route.addAttribute("ui.label", label);
+            route.addAttribute("ui.style", "text-size: 15;");       //LALIGNEMENT NE MARCHE PAS
     }
     
     private void labelCheckCentres(){
@@ -815,7 +812,7 @@ public class MaFenetre extends JFrame {
                 if(!label.equals("")){
                     label += " | ";
                 }
-                label += grapheActuel.getTypeComplet(centre);
+                label += centre.getAttribute("type");
             }
             centre.addAttribute("ui.label", label);
         }
@@ -831,8 +828,7 @@ public class MaFenetre extends JFrame {
                 double seuil = (double) seuil_test.getValue();
                 if (fiaRoute < seuil) {
                     route.addAttribute("ui.label", " ⚠ ");
-                    route.addAttribute("ui.style", "text-size: 25; icon: dyn-icon; icon-mode: at-left; ");
-                    route.addAttribute("ui.icon", "attention.jpg");
+                    route.addAttribute("ui.style", "text-size: 25;");
                 }
                 else {
                     labelCheckUneRoute(route);
