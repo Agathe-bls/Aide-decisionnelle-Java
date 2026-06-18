@@ -296,13 +296,6 @@ public class MaFenetre extends JFrame {
         this.setContentPane(pPrincipal);
     }
     
-    
-
-    
-    
-    
-    
-     
     private void initEcouteurs() {
         /**
          *

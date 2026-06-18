@@ -29,6 +29,7 @@ public class PopupInfosCentres {
         titre_ic = new JLabel("ID :" + centreClic.getId());
         t_nom_ic = new JLabel("Type de centre : " + grapheActuel.getTypeComplet(centreClic));
         
+        
         String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
         int choix = JOptionPane.showOptionDialog(fenetreActuelle, "Id : " + centreClic.getId() + "\nType de centre : " + grapheActuel.getTypeComplet(centreClic) + "\nQuelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
         
