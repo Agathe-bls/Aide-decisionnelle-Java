@@ -277,7 +277,6 @@ public class MaFenetre extends JFrame {
         
         //PARTIE BAS
         JPanel pBas = new JPanel(new BorderLayout());
-        pBas.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         
         coutEtTrajet = new JLabel("", JLabel.CENTER);
         coutEtTrajetV2 = new JLabel("", JLabel.CENTER);
@@ -285,12 +284,12 @@ public class MaFenetre extends JFrame {
         scrollPane = new JScrollPane(coutEtTrajet);
         scrollPane.setPreferredSize(new Dimension(768, 50));
         pBas.add(scrollPane, BorderLayout.WEST);
-        scrollPane.getViewport().setBackground(Color.decode("#616161"));
+        scrollPane.getViewport().setBackground(Color.WHITE);
         
         scrollPaneV2 = new JScrollPane(coutEtTrajetV2);
         scrollPaneV2.setPreferredSize(new Dimension(768, 50));
         pBas.add(scrollPaneV2, BorderLayout.EAST);
-        scrollPaneV2.getViewport().setBackground(Color.decode("#616161"));
+        scrollPaneV2.getViewport().setBackground(Color.WHITE);
         
         pPrincipal.add(pBas, BorderLayout.SOUTH);        
               
@@ -439,7 +438,7 @@ public class MaFenetre extends JFrame {
                     case 0:
                         chemin.cheminDureeMinDijkstra(depart, arrivee);
                         chemin.visualisationChemin("dureeMin");
-                        coutEtTrajet.setForeground(Color.decode("#b91809"));
+                        coutEtTrajet.setForeground(Color.RED);
                         coutEtTrajet.setText("Durée : " + chemin.getDureeTotale() + " min. " + chemin.getCentresTraverses());
                         break;
                     case 1:
@@ -464,9 +463,9 @@ public class MaFenetre extends JFrame {
                         
                         String type;
                         switch(TypeCentres){
-                            case 0 : type = "N"; coutEtTrajet.setForeground(Color.decode("#93fa8f")); break;
-                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#8FB6FA")); break;
-                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#FA8FF1")); break;
+                            case 0 : type = "N"; coutEtTrajet.setForeground(Color.decode("#6ac666")); break;
+                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#5f97f7")); break;
+                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#ee0bdc")); break;
                             default : type = null; coutEtTrajet.setForeground(Color.black); break;
                         }
                         tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);

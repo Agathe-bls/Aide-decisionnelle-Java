@@ -214,7 +214,7 @@ public class Chemin {
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
             for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+                e.setAttribute("ui.style", "fill-color: RED; size: 3px;");
             }
         } else if (typeChemin.equals("dureeEstimee")) {
             for (Edge e : routesTraversees) {
