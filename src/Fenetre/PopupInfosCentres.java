@@ -164,10 +164,7 @@ public class PopupInfosCentres {
         });
 
         fenetreTableau.getContentPane().add(new JScrollPane(tableau));
-        System.out.println("AAAAAAAAAAAAAAAA : " + tableau.getRowHeight());
-        System.out.println("AAAAAAAAAAAAAAAA : " + listeProches.size());
-        System.out.println("AAAAAAAAAAAAAAAA : " + listeProches.size() * tableau.getRowHeight() * 10);
-        fenetreTableau.setPreferredSize(new Dimension(700, listeProches.size() * tableau.getRowHeight()));
+        fenetreTableau.setPreferredSize(new Dimension(700, listeProches.size() * tableau.getRowHeight() + 60));
         fenetreTableau.pack();
         
         fenetreTableau.setLocationRelativeTo(null);
@@ -218,6 +215,12 @@ public class PopupInfosCentres {
         AfficheCouleursPlusieursLignes(tableau);
         
         fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+        if(listeDonnees.size() > 23){
+            fenetreTableau.setPreferredSize(new Dimension(700, 23 * tableau.getRowHeight() + 60));
+        }
+        else {
+            fenetreTableau.setPreferredSize(new Dimension(700, listeDonnees.size() * tableau.getRowHeight() + 60));
+        }
         fenetreTableau.pack();
         fenetreTableau.setLocationRelativeTo(null);
         fenetreTableau.setVisible(true);
@@ -266,6 +269,12 @@ public class PopupInfosCentres {
         AfficheCouleursPlusieursLignes(tableau);
         
         fenetreTableau.getContentPane().add(new JScrollPane(tableau));
+        if(listeDonnees.size() > 23){
+            fenetreTableau.setPreferredSize(new Dimension(700, 23 * tableau.getRowHeight() + 60));
+        }
+        else {
+            fenetreTableau.setPreferredSize(new Dimension(700, listeDonnees.size() * tableau.getRowHeight() + 60));
+        }
         fenetreTableau.pack();
         fenetreTableau.setLocationRelativeTo(null);
         fenetreTableau.setVisible(true);

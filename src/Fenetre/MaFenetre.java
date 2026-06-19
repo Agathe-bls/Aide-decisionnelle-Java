@@ -386,7 +386,7 @@ public class MaFenetre extends JFrame {
                 break;
                 
             default:
-                throw new IllegalStateException("Unexpected value: " + choix);
+                break;
         }
         recharger_infos();
     }
