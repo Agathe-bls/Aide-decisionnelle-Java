@@ -29,6 +29,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -78,7 +79,12 @@ public class MaFenetre extends JFrame {
     private JButton btNouveau_trajet;
     
     private final Chemin chemin = new Chemin(grapheActuel); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    
+    //PARTIE BAS
     private JLabel coutEtTrajet;
+    private JLabel coutEtTrajetV2;
+    private JScrollPane scrollPane;
+    private JScrollPane scrollPaneV2;
     
     private Tournee tournee1V;
     private Tournee tournee2V;
@@ -169,7 +175,8 @@ public class MaFenetre extends JFrame {
                 
         JPanel pPrincipal = new JPanel(new BorderLayout());
         
-        //Partie Haut Nouvelle-map
+        //PARTIE HAUT 
+        //Nouvelle-map
         JPanel pHaut = new JPanel(new GridBagLayout());
         pHaut.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         pHaut.setPreferredSize(new Dimension(1800,120));
@@ -253,6 +260,7 @@ public class MaFenetre extends JFrame {
         
         pPrincipal.add(pHaut, BorderLayout.NORTH);
         
+        //PARTIE CENTRE
         //MAP
         pMap = new JPanel(new BorderLayout());
         pMap.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -264,12 +272,27 @@ public class MaFenetre extends JFrame {
         
         pMap.add((Component) this.view, BorderLayout.CENTER);
         
-        coutEtTrajet = new JLabel("", JLabel.LEFT);
-        pMap.add(coutEtTrajet, BorderLayout.SOUTH);
-        
         pPrincipal.add(pMap,BorderLayout.CENTER);
         
         
+        //PARTIE BAS
+        JPanel pBas = new JPanel(new BorderLayout());
+        pBas.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        
+        coutEtTrajet = new JLabel("", JLabel.CENTER);
+        coutEtTrajetV2 = new JLabel("", JLabel.CENTER);
+        
+        scrollPane = new JScrollPane(coutEtTrajet);
+        scrollPane.setPreferredSize(new Dimension(768, 50));
+        pBas.add(scrollPane, BorderLayout.WEST);
+        scrollPane.getViewport().setBackground(Color.decode("#616161"));
+        
+        scrollPaneV2 = new JScrollPane(coutEtTrajetV2);
+        scrollPaneV2.setPreferredSize(new Dimension(768, 50));
+        pBas.add(scrollPaneV2, BorderLayout.EAST);
+        scrollPaneV2.getViewport().setBackground(Color.decode("#616161"));
+        
+        pPrincipal.add(pBas, BorderLayout.SOUTH);        
               
         
         //PARTIE EST 
@@ -398,6 +421,7 @@ public class MaFenetre extends JFrame {
          */
         intervention.setText("0 véhicules en tournée");
         coutEtTrajet.setText("");
+        coutEtTrajetV2.setText("");
         chemin.clearVisualisations();
         String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Quel type de trajet voulez-vous ?", "Choix du trajet", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
@@ -415,13 +439,13 @@ public class MaFenetre extends JFrame {
                     case 0:
                         chemin.cheminDureeMinDijkstra(depart, arrivee);
                         chemin.visualisationChemin("dureeMin");
-                        coutEtTrajet.setForeground(Color.RED);
+                        coutEtTrajet.setForeground(Color.decode("#b91809"));
                         coutEtTrajet.setText("Durée : " + chemin.getDureeTotale() + " min. " + chemin.getCentresTraverses());
                         break;
                     case 1:
                         chemin.cheminDureeEstimeeDijkstra(depart, arrivee);
                         chemin.visualisationChemin("dureeEstimee");
-                        coutEtTrajet.setForeground(Color.GREEN);
+                        coutEtTrajet.setForeground(Color.decode("#07b817"));
                         coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
                         break;
                     default:
@@ -440,16 +464,14 @@ public class MaFenetre extends JFrame {
                         
                         String type;
                         switch(TypeCentres){
-                            case 0 : type = "N"; break;
-                            case 1 : type = "M"; break;
-                            case 2 : type = "O"; break;
-                            case 3 : type = null; break;
-                            default : type = null; break;
+                            case 0 : type = "N"; coutEtTrajet.setForeground(Color.decode("#93fa8f")); break;
+                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#8FB6FA")); break;
+                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#FA8FF1")); break;
+                            default : type = null; coutEtTrajet.setForeground(Color.black); break;
                         }
                         tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
                         tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
                         tournee1V.colorierTourneeUnVehicule(0);
-                        coutEtTrajet.setForeground(Color.MAGENTA);
                         coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
                         tournee1V.afficherTournee(0);
                         
@@ -462,8 +484,11 @@ public class MaFenetre extends JFrame {
                         tournee2V.colorierTourneeUnVehicule(0);
                         tournee2V.colorierTourneeUnVehicule(1);
                         
-                        coutEtTrajet.setForeground(Color.RED);
-                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        coutEtTrajet.setForeground(Color.black);
+                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0));
+                        coutEtTrajetV2.setForeground(Color.decode("#b4083e"));
+                        coutEtTrajetV2.setText(" Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        
                         tournee2V.afficherTournee(0);
                         tournee2V.afficherTournee(1);
                         break;
@@ -489,6 +514,7 @@ public class MaFenetre extends JFrame {
          */
         testGraphPresent();
         coutEtTrajet.setText("");
+        coutEtTrajetV2.setText("");
         grapheActuel.visualisationGraphe();
         labelCentresParType();
         
@@ -701,6 +727,7 @@ public class MaFenetre extends JFrame {
          btNouveau_trajet.setFont(police);
          //Map
          coutEtTrajet.setFont(police);
+         coutEtTrajetV2.setFont(police);
          //Partie Est 
         titreComboC.setFont(policeTitre);
         //Menu
