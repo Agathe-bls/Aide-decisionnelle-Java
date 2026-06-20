@@ -214,11 +214,11 @@ public class Chemin {
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
             for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+                e.setAttribute("ui.style", "fill-color: RED; size: 3px;");
             }
         } else if (typeChemin.equals("dureeEstimee")) {
             for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #88D461; size: 3px; shape : cubic-curve; arrow-shape : arrow;");
+                e.setAttribute("ui.style", "fill-color: #07b817; size: 3px; shape : cubic-curve; arrow-shape : arrow;");
             }
         }
     }
@@ -227,14 +227,14 @@ public class Chemin {
         switch (nbVehicule) {
             case 1:
                 for (Edge e : routesTraversees) {
-                    e.setAttribute("ui.style", "fill-color: #F52727; size: 3px;");
+                    e.setAttribute("ui.style", "fill-color: black; size: 3px;");
                 }
                 centresTraverses.get(0).addAttribute("ui.label", "" + centresTraverses.get(0).getId());
                 centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px; text-color: black;");
                 break;
             case 2:
                 for (Edge e : routesTraversees) {
-                    e.setAttribute("ui.style", "fill-color: #88D461; size: 3px;");
+                    e.setAttribute("ui.style", "fill-color: #b4083e; size: 3px;");
                 }
                 centresTraverses.get(0).addAttribute("ui.label", ""+centresTraverses.get(0).getId());
                 centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px;");

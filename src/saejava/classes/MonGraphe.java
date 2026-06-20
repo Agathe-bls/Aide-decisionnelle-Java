@@ -271,7 +271,6 @@ public class MonGraphe extends SingleGraph {
         listeResultat.add(listeMat);  
         listeResultat.add(listeNutri); 
         listeResultat.add(listeBo);    
-
         return listeResultat;
     }
 }
