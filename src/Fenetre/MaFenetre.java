@@ -19,16 +19,19 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -85,6 +88,8 @@ public class MaFenetre extends JFrame {
     
     //Partie Est 
     private JLabel titreComboC;
+    private DefaultListModel<String> listModelCentres; // <-- À AJOUTER
+    private JList<String> listeVisuelleCentres;        // <-- À AJOUTER
     
     //Menu
     private JMenuBar menuBar;
@@ -269,24 +274,41 @@ public class MaFenetre extends JFrame {
         
         pPrincipal.add(pMap,BorderLayout.CENTER);
         
-        
-              
-        
-        //PARTIE EST 
+       //PARTIE EST 
         JPanel pEst = new JPanel(new GridBagLayout());
         pEst.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         GridBagConstraints gbcEst = new GridBagConstraints();
-        gbcEst.insets = new Insets(20, 10, 20, 10);
-        pEst.setPreferredSize(new Dimension(200,650));
+        pEst.setPreferredSize(new Dimension(220,650));
         pEst.setBackground(Color.lightGray);
         
+        // Titre
         titreComboC = new JLabel("Centres de santé");
+        gbcEst.insets = new Insets(15, 10, 10, 10);
         gbcEst.gridx = 0; gbcEst.gridy = 0; 
+        gbcEst.weightx = 1.0;
+        gbcEst.fill = GridBagConstraints.HORIZONTAL;
+        titreComboC.setHorizontalAlignment(JLabel.CENTER);
         pEst.add(titreComboC, gbcEst);
         
-        pPrincipal.add(pEst, BorderLayout.EAST);
+        // Initialisation de la JList
+        listModelCentres = new DefaultListModel<>();
+        listeVisuelleCentres = new JList<>(listModelCentres);
+        listeVisuelleCentres.setBackground(Color.lightGray);
+        listeVisuelleCentres.setFont(new Font("Arial", Font.PLAIN, 14));
         
+        // Mise en place du ScrollPane pour la liste
+        JScrollPane scrollCentres = new JScrollPane(listeVisuelleCentres);
+        scrollCentres.setBorder(BorderFactory.createEmptyBorder());
+        
+        gbcEst.insets = new Insets(0, 10, 15, 10);
+        gbcEst.gridy = 1;
+        gbcEst.weighty = 1.0; // Prend tout l'espace disponible vers le bas
+        gbcEst.fill = GridBagConstraints.BOTH;
+        pEst.add(scrollCentres, gbcEst);
+        
+        pPrincipal.add(pEst, BorderLayout.EAST);
         this.pack();
+
         this.setContentPane(pPrincipal);
     }
     
@@ -482,6 +504,28 @@ public class MaFenetre extends JFrame {
         }
     }
     
+    private void mettreAJourListeEst() {
+        if (listModelCentres == null) return;
+        
+        listModelCentres.clear(); // On vide l'ancienne liste
+        
+        if (grapheActuel != null && !grapheActuel.getEstVide()) {
+            for (Node n : grapheActuel.getEachNode()) {
+                String id = n.getId();
+                String typeCode = n.getAttribute("type");
+                String typeComplet = "";
+                
+                // Traduction des codes de vos attributs graphstream en texte lisible
+                if ("N".equals(typeCode)) typeComplet = "Nutrition";
+                else if ("M".equals(typeCode)) typeComplet = "Maternité";
+                else if ("O".equals(typeCode)) typeComplet = "Bloc Opératoire";
+                else typeComplet = "Inconnu";
+                
+                listModelCentres.addElement(" " + id + " : " + typeComplet);
+            }
+        }
+    }
+    
     private void recharger_infos(){
         /**
          * 
@@ -491,6 +535,7 @@ public class MaFenetre extends JFrame {
         coutEtTrajet.setText("");
         grapheActuel.visualisationGraphe();
         labelCentresParType();
+        mettreAJourListeEst();
         
         seuil_test.setValue(0.2);
     }
