@@ -34,6 +34,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
+
+import Exceptions.NombreVehiculeInvalideException;
 import saejava.classes.MonGraphe;
 import saejava.classes.Chemin;
 import saejava.classes.Tournee;
@@ -356,7 +358,14 @@ public class MaFenetre extends JFrame {
    
         
         //Nouveau trajet 
-        btNouveau_trajet.addActionListener(e -> popup_nouv_t());
+        btNouveau_trajet.addActionListener(e -> {
+            try {
+                popup_nouv_t();
+            } catch (NombreVehiculeInvalideException ex) {
+                System.out.println(ex.getMessage());
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         //Menu
         checkFia.addActionListener((ActionEvent e) -> {
@@ -399,21 +408,28 @@ public class MaFenetre extends JFrame {
 
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
+                try {
                 grapheActuel.clear();
                 grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
+                } catch (java.lang.NumberFormatException ex) {
+                    if (!"".equals(reponse)) {
+                        System.out.println("Valeur trop grande : "+ reponse);
+                        JOptionPane.showMessageDialog(this, "Valeur trop grande : "+reponse, "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        System.out.println("Pas de valeur rentrée");
+                        JOptionPane.showMessageDialog(this, "Pas de valeur rentrée", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
                 break;
-
-            case 2:
-                break;
-                
             default:
-                throw new IllegalStateException("Unexpected value: " + choix);
+                break;
         }
         recharger_infos();
     }
     
-    private void popup_nouv_t(){
+    private void popup_nouv_t() throws NombreVehiculeInvalideException {
         coutEtTrajet.setText("");
         chemin.clearVisualisations();
         String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
@@ -483,8 +499,7 @@ public class MaFenetre extends JFrame {
                         
                         break;
                     default:
-                        throw new AssertionError();
-                        //FAIRE UNE EXCEPTION PAR RAPPORT AU NB CE V2HICULES OU AUTRE ERREURS
+                        throw new NombreVehiculeInvalideException();
                 } break;
 
             case 2:break;
