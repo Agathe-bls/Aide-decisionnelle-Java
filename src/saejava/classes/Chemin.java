@@ -16,8 +16,7 @@ import org.graphstream.graph.Node;
  */
 public class Chemin {
 
-    private MonGraphe grapheAssocie;
-
+    private final MonGraphe grapheAssocie;
     private double fiabiliteTotale;
     private int distanceTotale;
     private int dureeTotale;
@@ -25,6 +24,10 @@ public class Chemin {
     private ArrayList<Node> centresTraverses;
     private ArrayList<Edge> routesTraversees;
 
+    /**
+     *
+     * @param grapheAssocie
+     */
     public Chemin(MonGraphe grapheAssocie) {
         this.grapheAssocie = grapheAssocie;
         this.fiabiliteTotale = 0.0;
@@ -33,28 +36,35 @@ public class Chemin {
         this.centresTraverses = new ArrayList<>();
         this.routesTraversees = new ArrayList<>();
     }
-    //NORMALEMENT IL Y A PAS DE PROBLEME MAIS IL FAUT PEUT ETRE METTRE UNE EXCEPTION POUR ETRE SUR QUE DEPART/GRAPH/ARRIVEE VIENNENT BIEN DU MËME GRAPHE
-
-    public double getFiabiliteTotale() {
-        return fiabiliteTotale;
-    }
     
+    /**
+     *
+     * @return
+     */
     public int getDistanceTotale() {
         return distanceTotale;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDureeTotale() {
         return dureeTotale;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getDureeEstimee() {
         return dureeEstimee;
     }
 
-    public ArrayList<Edge> getRoutesTraversees() {
-        return routesTraversees;
-    }
-
+    /**
+     *
+     * @return
+     */
     public String getCentresTraverses() {
         String resultat = "";
         for (Node n : centresTraverses) {
@@ -67,12 +77,19 @@ public class Chemin {
         return resultat;
     }
     
-    @Override
-    public String toString() {
-        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
-                + dureeEstimee + "]";
-    }
+//    @Override
+//    public String toString() {
+//        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
+//                + dureeEstimee + "]";
+//    }
 
+    /**
+     *
+     * @param depart
+     * @param arrivee
+     * @return
+     */
+    
     public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
 
@@ -114,6 +131,13 @@ public class Chemin {
     }
 
     //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
+
+    /**
+     *
+     * @param depart
+     * @param arrivee
+     * @return
+     */
     public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
 
@@ -155,11 +179,24 @@ public class Chemin {
     }
 
     //LES FONCTIONS SECONDAIRES UTILISEES POUR L'ALGO :
+
+    /**
+     *
+     */
     public class InfosCentresDijkstra {
 
         private double coutCalcule;
         private Node centrePrecedent;
         private boolean estTraite;
+
+        /**
+         *
+         */
+        public InfosCentresDijkstra() {
+            this.coutCalcule = Double.POSITIVE_INFINITY;
+            this.centrePrecedent = null;
+            this.estTraite = false;
+        }
     }
 
     private HashMap<Node, InfosCentresDijkstra> initAlgoDijkstra(Node depart) {
@@ -174,11 +211,6 @@ public class Chemin {
 
         for (Node n : grapheAssocie.getEachNode()) {
             InfosCentresDijkstra infosN = new InfosCentresDijkstra();
-
-            infosN.coutCalcule = Double.POSITIVE_INFINITY;
-            infosN.centrePrecedent = null;
-            infosN.estTraite = false;
-
             if (n == depart) {
                 infosN.coutCalcule = 0.0;
             }
@@ -210,7 +242,11 @@ public class Chemin {
         return centreMin;
     }
 
-    //Visualisation des chemins : 
+//Visualisations : 
+    /**
+     *
+     * @param typeChemin
+     */
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
             for (Edge e : routesTraversees) {
@@ -223,6 +259,10 @@ public class Chemin {
         }
     }
     
+    /**
+     *
+     * @param nbVehicule
+     */
     public void visualisationTournee(int nbVehicule) {
         switch (nbVehicule) {
             case 1:
@@ -245,6 +285,9 @@ public class Chemin {
         }
     }
 
+    /**
+     *
+     */
     public void clearVisualisations() {
         grapheAssocie.visualisationGraphe();
         for (Edge e : grapheAssocie.getEachEdge()) {

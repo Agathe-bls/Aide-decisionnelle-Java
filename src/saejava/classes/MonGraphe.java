@@ -2,11 +2,9 @@ package saejava.classes;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
-
 import java.util.Scanner;
 
 //Création graphe aléatoire
-import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
@@ -16,16 +14,29 @@ import java.util.random.RandomGenerator;
 public class MonGraphe extends SingleGraph {
 
     private boolean estVide;
-
+    
+    /**
+     * 
+     * @param id_graphe
+     */
     public MonGraphe(String id_graphe) {
         super(id_graphe);
         estVide = true;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getEstVide() {
         return estVide;
     }
 
+    /**
+     *
+     * @param centre
+     * @return
+     */
     public String getTypeComplet(Node centre) {
         String res = "";
         if (centre.getAttribute("type").equals("M")) {
@@ -40,7 +51,7 @@ public class MonGraphe extends SingleGraph {
         return res;
     }
 
-    //Import des graphes des fichiers    
+//Import des graphes des fichiers
     private static ArrayList<String> lireCSV(String nomFichier) {
         ArrayList<String> lignes = new ArrayList<>();
         try {
@@ -96,7 +107,12 @@ public class MonGraphe extends SingleGraph {
     }
 
 //Création du graphe aléatoire
-    public void creerGrapheAleatoire(int N) {
+
+    /**
+     *
+     * @param N
+     */
+    public void creerGrapheAlea(int N) {
         ArrayList<Node> noeudsAjoutes = new ArrayList<>();
         for (int i = 1; i <= N; i++) {
             if (noeudsAjoutes.isEmpty()) {
@@ -165,6 +181,9 @@ public class MonGraphe extends SingleGraph {
         return choix;
     }
 
+    /**
+     *
+     */
     public void visualisationGraphe() {
         for (Node n : this.getNodeSet()) {
             n.setAttribute("ui.style", "size : 20;");
@@ -183,6 +202,9 @@ public class MonGraphe extends SingleGraph {
         }
     }
 
+    /**
+     *
+     */
     public void visualisationRoutes() { // 0 = fiabilité  / 1 = duree / 2 = distance
         for (Edge e : this.getEachEdge()) {
             e.addAttribute("ui.label", e.getAttribute("fiabilite"));
@@ -268,9 +290,9 @@ public class MonGraphe extends SingleGraph {
 
         //Ajout des sous-listes dans la liste principale
         ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
-        listeResultat.add(listeMat);  
-        listeResultat.add(listeNutri); 
-        listeResultat.add(listeBo);    
+        listeResultat.add(listeMat);
+        listeResultat.add(listeNutri);
+        listeResultat.add(listeBo);
 
         return listeResultat;
     }

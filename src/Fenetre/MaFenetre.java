@@ -107,12 +107,10 @@ public class MaFenetre extends JFrame {
     //popup info centre
     private PopupInfosCentres popupInfoC;
 
-    
+    /**
+     * 
+     */
     public MaFenetre(){
-        /**
-         * 
-         * @author Auryann / Agathe
-         */
         super("MedicOne");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
@@ -140,7 +138,6 @@ public class MaFenetre extends JFrame {
         menuCentres = new JMenu("Informations des centres");
         menuRoutes = new JMenu("Informations des routes");
         menuSeuil = new JMenu("Seuil de dangerosité");
-        //                                  menuSeuil.addSeparator(); CA NE MARCHE PAS JSP POURQUOI
         
         checkNom = new JCheckBoxMenuItem("Noms des centres");
         checkNom.setSelected(true);
@@ -150,7 +147,6 @@ public class MaFenetre extends JFrame {
         checkDistance = new JCheckBoxMenuItem("Distances");
         seuil_test = new JSpinner(new SpinnerNumberModel(0.1,0.1,1,0.1));
         seuil_test.setPreferredSize(new Dimension(173,20));
-        
         
         menuCentres.add(checkNom);
         menuCentres.add(checkType);
@@ -165,7 +161,6 @@ public class MaFenetre extends JFrame {
         menuBar.add(menuRoutes);
         menuBar.add(menuSeuil);
     }
-    
     
     private void initComposants(){
         /**
@@ -400,7 +395,7 @@ public class MaFenetre extends JFrame {
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 grapheActuel.clear();
-                grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
+                grapheActuel.creerGrapheAlea(Integer.parseInt(reponse));
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 break;
 
@@ -464,8 +459,8 @@ public class MaFenetre extends JFrame {
                         String type;
                         switch(TypeCentres){
                             case 0 : type = "N"; coutEtTrajet.setForeground(Color.decode("#6ac666")); break;
-                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#5f97f7")); break;
-                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#ee0bdc")); break;
+                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#ee0bdc")); break;
+                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#5f97f7")); break;
                             default : type = null; coutEtTrajet.setForeground(Color.black); break;
                         }
                         tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
