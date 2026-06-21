@@ -126,6 +126,10 @@ public class MaFenetre extends JFrame {
         this.setVisible(true);
     }
     
+    public MonGraphe getGrapheActuel() {
+        return grapheActuel;
+    }
+    
     private void créationMenu(){
         menuBar = new JMenuBar();
         MaFenetre.this.setJMenuBar(menuBar);
