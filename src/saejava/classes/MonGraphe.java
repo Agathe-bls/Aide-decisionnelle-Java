@@ -1,42 +1,71 @@
 package saejava.classes;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.random.RandomGenerator;
+import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
+import java.util.ArrayList;
+
+//Import csv
+import java.io.FileInputStream;
+import java.util.Scanner;
+
+//Création graphe aléatoire
+import java.util.random.RandomGenerator;
 
 public class MonGraphe extends SingleGraph {
 
     private boolean estVide;
-
+    
+    /**
+     * Construit un nouveau graphe vide.
+     *
+     * @param id_graphe identifiant du graphe
+     *
+     * @author Balsan Agathe
+     */
     public MonGraphe(String id_graphe) {
         super(id_graphe);
         estVide = true;
     }
 
+    /**
+     * Indique si le graphe est vide ou non.
+     *
+     * @return true si le graphe ne contient aucun centre, false sinon
+     *
+     * @author Balsan Agathe
+     */
     public boolean getEstVide() {
         return estVide;
     }
 
+    /**
+     * Retourne l'intitulé complet du type d'un centre.
+     *
+     * @param centre centre dont on souhaite connaître le type complet
+     *
+     * @return le nom complet du type du centre ("Nutrition", "Maternité" ou "Bloc opératoire")
+     *
+     * @throws IllegalArgumentException si le type du centre est invalide
+     * 
+     * @author Balsan Agathe
+     */
     public String getTypeComplet(Node centre) {
         String res = "";
 
         if (centre.getAttribute("type").equals("M")) {
-            res = "Maternite";
+            res = "Maternité";
         } else if (centre.getAttribute("type").equals("O")) {
-            res = "Bloc operatoire";
+            res = "Bloc opératoire";
         } else if (centre.getAttribute("type").equals("N")) {
             res = "Nutrition";
         } else {
-            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT À CA
         }
         return res;
     }
 
-    //Import des graphes des fichiers    
+//Import des graphes des fichiers
     private static ArrayList<String> lireCSV(String nomFichier) {
         ArrayList<String> lignes = new ArrayList<>();
         try {
@@ -94,7 +123,20 @@ public class MonGraphe extends SingleGraph {
     }
 
 //Création du graphe aléatoire
-    public void creerGrapheAleatoire(int N) {
+
+    /**
+     * Génère un graphe aléatoire connexe contenant un nombre donné de centres.
+     * Les types des centres ainsi que les caractéristiques des routes sont attribués aléatoirement. 
+     * Le centre est de type Maternité avec une probabilité de 3/5, et Bloc Opératoire ou Nutrition avec une probabilité de 1/5.
+     * Une route existe avec une probabilité de 1/5.
+     * Sa fiabilité est comprise entre 2/10 et 10/10, sa distance entre 10 et 50 km et sa durée entre 10 et 120 minutes. 
+     * Le graphe généré est garanti connexe grâce à au moins une route de fiabilité supérieure à 0,25 reliant chaque nouveau centre au début de graphe existant.
+     * 
+     * @param N nombre de centres à générer
+     *
+     * @author Balsan Agathe
+     */
+    public void creerGrapheAlea(int N) {
         ArrayList<Node> noeudsAjoutes = new ArrayList<>();
         for (int i = 1; i <= N; i++) {
             if (noeudsAjoutes.isEmpty()) {
@@ -163,6 +205,14 @@ public class MonGraphe extends SingleGraph {
         return choix;
     }
 
+    /**
+     * Configure l'affichage graphique des centres du graphe en fonction de leur
+     * type en appliquant les couleurs et les labels associés.
+     *
+     * @throws IllegalArgumentException si le type du centre est invalide
+     * 
+     * @author Balsan Agathe
+     */
     public void visualisationGraphe() {
         for (Node n : this.getNodeSet()) {
             n.setAttribute("ui.style", "size : 20;");
@@ -180,11 +230,90 @@ public class MonGraphe extends SingleGraph {
             }
         }
     }
+    
+    public ArrayList<ArrayList<Object[]>> tri_centre_distance(Node n) {
+        //Initialisation des variables locales
+        Chemin algoChemin = new Chemin(this);
+        ArrayList<Object[]> listeMat = new ArrayList<>();
+        ArrayList<Object[]> listeNutri = new ArrayList<>();
+        ArrayList<Object[]> listeBo = new ArrayList<>();
 
-    public void visualisationRoutes() { // 0 = fiabilité  / 1 = duree / 2 = distance
-        for (Edge e : this.getEachEdge()) {
-            e.addAttribute("ui.label", e.getAttribute("fiabilite"));
-            e.addAttribute("ui.style", "text-size: 20px;");
+        //Parcours des noeuds
+        for (Node noeud : this.getEachNode()) {
+            String type = this.getTypeComplet(noeud);
+
+            if ("Maternité".equals(type) || "Nutrition".equals(type) || "Bloc opératoire".equals(type)) {
+                Object distance;
+                if (noeud.equals(n)) {
+                    distance = 0;
+                } else {
+                    distance = algoChemin.cheminDureeMinDijkstra(n, noeud).getDistanceTotale();
+                }
+
+                Object[] donneesNoeud = new Object[]{"", noeud.getId(), distance};
+
+                //Tri par type
+                if ("Maternité".equals(type)) {
+                    listeMat.add(donneesNoeud);
+                } else if ("Nutrition".equals(type)) {
+                    listeNutri.add(donneesNoeud);
+                } else if ("Bloc opératoire".equals(type)) {
+                    listeBo.add(donneesNoeud);
+                }
+            }
         }
+
+        //Ajout des sous-listes dans la liste principale
+        ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
+        listeResultat.add(listeMat);  
+        listeResultat.add(listeNutri); 
+        listeResultat.add(listeBo);    
+
+        return listeResultat;
+    }
+    
+    public ArrayList<ArrayList<Object[]>> tri_centre_duree(Node n) {
+        //Initialisation des variables locales
+        Chemin algoChemin = new Chemin(this);
+        ArrayList<Object[]> listeMat = new ArrayList<>();
+        ArrayList<Object[]> listeNutri = new ArrayList<>();
+        ArrayList<Object[]> listeBo = new ArrayList<>();
+
+        //Parcours des noeuds
+        for (Node noeud : this.getEachNode()) {
+            String type = this.getTypeComplet(noeud);
+
+            if ("Maternité".equals(type) || "Nutrition".equals(type) || "Bloc opératoire".equals(type)) {
+                Object dureeT;
+                Object dureeE;
+                if (noeud.equals(n)) {
+                    dureeT = 0;
+                    dureeE = 0;
+                } else {
+                    dureeT = algoChemin.cheminDureeMinDijkstra(n, noeud).getDureeTotale();
+                    dureeE = algoChemin.cheminDureeMinDijkstra(n, noeud).getDureeEstimee();
+                }
+
+                Object[] donneesNoeud = new Object[]{"", noeud.getId(), dureeT, dureeE};
+
+                //Tri par type
+                if ("Maternité".equals(type)) {
+                    listeMat.add(donneesNoeud);
+                } else if ("Nutrition".equals(type)) {
+                    listeNutri.add(donneesNoeud);
+                } else if ("Bloc opératoire".equals(type)) {
+                    listeBo.add(donneesNoeud);
+                }
+            }
+        }
+
+        //Ajout des sous-listes dans la liste principale
+        ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
+        listeResultat.add(listeMat);
+        listeResultat.add(listeNutri);
+        listeResultat.add(listeBo);
+
+        return listeResultat;
     }
 }
+

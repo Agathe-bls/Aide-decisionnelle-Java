@@ -5,8 +5,6 @@
 package saejava.classes;
 
 import java.util.ArrayList;
-import org.graphstream.graph.Edge;
-
 import org.graphstream.graph.Node;
 
 public class Tournee {
@@ -31,14 +29,6 @@ public class Tournee {
             this.lstVehicules.add(new Vehicule(positionDepart));
             this.lstVehicules.add(new Vehicule(positionDepart));
     }
-
-    public Node getPositionActuelle(Vehicule vehicule) {
-        return vehicule.positionActuelle;
-    }
-
-    public ArrayList<Node> getCentresLivres(Vehicule v) {
-        return v.centresLivres;
-    }
     
     public String getLabelCentresLivres(int vehiculeChoisi) {
         String resultat = "Chemin pris :";
@@ -46,15 +36,14 @@ public class Tournee {
             resultat += "aucun trajet calculé.";
         }
         else {
-            for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {
-                resultat += ("/" + n.getId() + " (" + n.getAttribute("type") + ")");
+            for (Node n : lstVehicules.get(vehiculeChoisi).centresLivres) {                
+                if (lstVehicules.get(0) == n)
+                    resultat = n.getId();
+                else 
+                    resultat += n.getId() + " > ";
             }
-        }        
+        }
         return resultat;
-    }
-
-    public ArrayList<Chemin> getTrajets(Vehicule v) {
-        return v.trajets;
     }
 
     public int getDureeTotale(int vehiculeChoisi) {
@@ -63,7 +52,7 @@ public class Tournee {
 
     public ArrayList<Node> getCentresALivrer(String type) { // pour info on mettra null en parametre quand on veut tous les type de centre c plus simple
         ArrayList<Node> centres = new ArrayList<>();
-        
+
         for (Node centre : graphe.getEachNode()) {
             String typeCentre = centre.getAttribute("type");
 
@@ -163,7 +152,7 @@ public class Tournee {
 
     // pour debugger et afficher
     public void afficherTournee(int vehiculeChosi) {
-        System.out.println("===== Tournee du véhicule =====");
+        System.out.println("===== Tournee du véhicule " + vehiculeChosi + " =====");
 
         if (lstVehicules.get(vehiculeChosi).trajets.isEmpty()) {
             System.out.println("Aucun trajet calculé.");
@@ -174,12 +163,6 @@ public class Tournee {
 
         for (Node n : lstVehicules.get(vehiculeChosi).centresLivres) {
             System.out.println("- " + n.getId() + " (" + n.getAttribute("type") + ")");
-        }
-
-        System.out.println("\nTrajets :");
-
-        for (Chemin c : lstVehicules.get(vehiculeChosi).trajets) {
-            System.out.println(c);
         }
 
         System.out.println("\nDurée totale : " + lstVehicules.get(vehiculeChosi).dureeTotale + " min");

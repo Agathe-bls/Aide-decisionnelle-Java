@@ -9,12 +9,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,11 +29,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
+import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
 
@@ -40,24 +44,24 @@ import saejava.classes.MonGraphe;
 import saejava.classes.Chemin;
 import saejava.classes.Tournee;
 
-/**
- *
- * @author Auryann / Agathe
- */
 public class MaFenetre extends JFrame {
-    
+
+//PARTIE MAP
     private DefaultView view;
+    private final MonGraphe grapheActuel = new MonGraphe("gActuel"); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    private JPanel pMap;
     
-    //Partie Haut Nouvelle-map
+//PARTIE HAUT
+    //Nouvelle-map
     private JLabel nom_m;
     private JButton btNouvelle_map;
     public static JFileChooser f;
     
-    //Partie Haut Vehicules
+    //Vehicules
     private JLabel vehicule;
     private JLabel intervention;
     
-    //Partie Haut Centres
+    //Centres
     private JLabel type_centre;
     private JLabel nutrition;
     private JLabel nbr_n;
@@ -69,23 +73,23 @@ public class MaFenetre extends JFrame {
     private JLabel nbr_bo;
     private JPanel couleur_bo;
     
-    //Map
-    private MonGraphe grapheActuel = new MonGraphe("gActuel");
-    private JPanel pMap;
-    
-    //Partie Haut Nouveau trajets
+    //Nouveau trajets
     private JButton btNouveau_trajet;
+    private final Chemin chemin = new Chemin(grapheActuel); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
     
-    private Chemin chemin = new Chemin(grapheActuel);
+//PARTIE BAS
     private JLabel coutEtTrajet;
+    private JLabel coutEtTrajetV2;
+    private JScrollPane scrollPane;
+    private JScrollPane scrollPaneV2;
     
     private Tournee tournee1V;
     private Tournee tournee2V;
     
-    //Partie Est 
+//PARTIE EST 
     private JLabel titreComboC;
     
-    //Menu
+//MENU
     private JMenuBar menuBar;
     private JMenu menuCentres;
     private JMenu menuRoutes;
@@ -97,17 +101,19 @@ public class MaFenetre extends JFrame {
     private JCheckBoxMenuItem checkDistance;
     private JSpinner seuil_test;
     
-    //popup info centre
-    private JLabel titre_ic;
-    private JLabel t_nom_ic;
-    
-    
-  
-    
+//Infos au clic
+    private PopupInfosCentres popupInfoC;
+
+    /**
+     * Construit la fênetre principalede l'application.
+     * Initialise l'interface graphique, son menu, ses composants, ses écouteurs, ses paramètres d'affichage ainsi que la visualisation initiale du graphe.
+     * La fenêtre est ensuite étendue sur tout l'écrant et rendue visible.
+     *
+     * @author Balsan Agathe
+     */
     public MaFenetre(){
         super("MedicOne");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(1500,800));
         this.pack();
         this.setLocationRelativeTo(null);
         
@@ -118,6 +124,7 @@ public class MaFenetre extends JFrame {
         visuSeuil();
         gererTailleTextes();
         
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
     }
     
@@ -128,7 +135,6 @@ public class MaFenetre extends JFrame {
         menuCentres = new JMenu("Informations des centres");
         menuRoutes = new JMenu("Informations des routes");
         menuSeuil = new JMenu("Seuil de dangerosité");
-        //                                  menuSeuil.addSeparator(); CA NE MARCHE PAS JSP POURQUOI
         
         checkNom = new JCheckBoxMenuItem("Noms des centres");
         checkNom.setSelected(true);
@@ -138,7 +144,6 @@ public class MaFenetre extends JFrame {
         checkDistance = new JCheckBoxMenuItem("Distances");
         seuil_test = new JSpinner(new SpinnerNumberModel(0.1,0.1,1,0.1));
         seuil_test.setPreferredSize(new Dimension(173,20));
-        
         
         menuCentres.add(checkNom);
         menuCentres.add(checkType);
@@ -154,10 +159,11 @@ public class MaFenetre extends JFrame {
         menuBar.add(menuSeuil);
     }
     
-    private void initComposants(){
+    private void initComposants(){ 
         JPanel pPrincipal = new JPanel(new BorderLayout());
         
-        //Partie Haut Nouvelle-map
+        //PARTIE HAUT 
+        //Nouvelle-map
         JPanel pHaut = new JPanel(new GridBagLayout());
         pHaut.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         pHaut.setPreferredSize(new Dimension(1800,120));
@@ -184,7 +190,7 @@ public class MaFenetre extends JFrame {
         pHaut.add(intervention, gbcHaut);
         gbcHaut.gridheight = 1;
         
-        //Type De Centre
+        //Centres
         gbcHaut.insets = new Insets(5, 20, 5, 20); // Pour ne pas avoir trop d'espaces entre les infos des centres
         type_centre = new JLabel("Type De Centre", JLabel.CENTER);
         nutrition = new JLabel("Nutrition");
@@ -252,14 +258,25 @@ public class MaFenetre extends JFrame {
         
         pMap.add((Component) this.view, BorderLayout.CENTER);
         
-        coutEtTrajet = new JLabel("", JLabel.LEFT);
-        pMap.add(coutEtTrajet, BorderLayout.SOUTH);
-        
         pPrincipal.add(pMap,BorderLayout.CENTER);
         
+        //PARTIE BAS
+        JPanel pBas = new JPanel(new BorderLayout());
         
+        coutEtTrajet = new JLabel("", JLabel.CENTER);
+        coutEtTrajetV2 = new JLabel("", JLabel.CENTER);
         
-              
+        scrollPane = new JScrollPane(coutEtTrajet);
+        scrollPane.setPreferredSize(new Dimension(768, 50));
+        pBas.add(scrollPane, BorderLayout.WEST);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        
+        scrollPaneV2 = new JScrollPane(coutEtTrajetV2);
+        scrollPaneV2.setPreferredSize(new Dimension(768, 50));
+        pBas.add(scrollPaneV2, BorderLayout.EAST);
+        scrollPaneV2.getViewport().setBackground(Color.WHITE);
+        
+        pPrincipal.add(pBas, BorderLayout.SOUTH);
         
         //PARTIE EST 
         JPanel pEst = new JPanel(new GridBagLayout());
@@ -279,68 +296,8 @@ public class MaFenetre extends JFrame {
         this.setContentPane(pPrincipal);
     }
     
-    private void popup_infos_centre(){
-        JLabel titre_ic = new JLabel("Id :");
-        JLabel t_nom_ic = new JLabel("Type de centre : ");
-        
-        String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
-        int choix = JOptionPane.showOptionDialog(this, "Quelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
-        
-        switch (choix) {
-            case 0:
-                String choixDepart  = JOptionPane.showInputDialog( null, "De quel centre voulez vous partir", "Choix du départ du chemin", JOptionPane.QUESTION_MESSAGE) ;
-                String choixArrivee  = JOptionPane.showInputDialog( null, "A quel centre voulez vous arriver", "Choix de l'arrivée du chemin", JOptionPane.QUESTION_MESSAGE) ;
-                Node depart = grapheActuel.getNode(choixDepart.toUpperCase());
-                Node arrivee = grapheActuel.getNode(choixArrivee.toUpperCase());
-                
-                String[] optionsCh = {"Chemin le plus rapide", "Chemin rapide et fiable", "Annuler"};
-                int choixCh = JOptionPane.showOptionDialog(this, "Quel type de chemin voulez-vous ?", "Choix du chemin", 0, JOptionPane.QUESTION_MESSAGE, null, optionsCh, optionsCh[2]);
-                switch (choixCh) {
-                    case 0:
-                        chemin.cheminDureeMinDijkstra(depart, arrivee);
-                        chemin.visualisationChemin("dureeMin");
-                        coutEtTrajet.setForeground(Color.RED);
-                        coutEtTrajet.setText("Durée : " + chemin.getDureeTotale() + " min. " + chemin.getCentresTraverses());
-                        break;
-                    case 1:
-                        chemin.cheminDureeEstimeeDijkstra(depart, arrivee);
-                        chemin.visualisationChemin("dureeEstimee");
-                        coutEtTrajet.setForeground(Color.GREEN);
-                        coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
-                        break;
-                    default:
-                        throw new AssertionError();
-                        //FAIRE UNE EXCEPTION POUR DIRE QUE LES CHEMINS DE D2PART ET ARRIVEES N4EXISTENT PAS OU AUTRE ERREURS
-                }
-                break;
-
-            case 1:
-                String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
-                int NbV = Integer.parseInt(choixNbV);
-                
-                switch (NbV) {
-                    case 1:
-                        System.out.println("On a pas encore cette possibilité");
-                        break;
-                    case 2:
-                        System.out.println("On a pas encore cette possibilité");
-                        break;
-                    default:
-                        throw new AssertionError();
-                        //FAIRE UNE EXCEPTION PAR RAPPORT AU NB CE V2HICULES OU AUTRE ERREURS
-                } break;
-
-            case 2:break;
-                
-            default:
-                throw new IllegalStateException("Unexpected value: " + choix);
-                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT
-        }
-    }
-    
-     
     private void initEcouteurs() {
-        //Partie Haut
+        //PARTIE HAUT
         btNouvelle_map.addActionListener((ActionEvent e) -> {
             try {
                 popup_nouv_district();
@@ -348,11 +305,28 @@ public class MaFenetre extends JFrame {
                 System.getLogger(MaFenetre.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
         });
+
         
         view.addMouseListener(new MouseAdapter() {
-        @Override
+            @Override
             public void mousePressed(MouseEvent e) {
-                popup_infos_centre();
+                if (javax.swing.SwingUtilities.isRightMouseButton(e)) {
+                    GraphicsConfiguration gc = view.getGraphicsConfiguration();
+                    AffineTransform tx = gc.getDefaultTransform();
+
+                    float abscisse = (float) (e.getX() * tx.getScaleX());
+                    float ordonnee = (float) (e.getY() * tx.getScaleY());
+
+                    GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
+                    System.out.println(element);
+                    if (element != null) {
+                        Node n = grapheActuel.getNode(element.getId());
+                        if (n != null) {
+                            //popup_infos_centre(n);
+                            popupInfoC = new PopupInfosCentres(MaFenetre.this, grapheActuel, n);
+                        }
+                    }
+                }
             }
         });
    
@@ -367,7 +341,7 @@ public class MaFenetre extends JFrame {
             }
         });
 
-        //Menu
+        //MENU
         checkFia.addActionListener((ActionEvent e) -> {
             labelCheckRoutes();
         });
@@ -410,7 +384,7 @@ public class MaFenetre extends JFrame {
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 try {
                 grapheActuel.clear();
-                grapheActuel.creerGrapheAleatoire(Integer.parseInt(reponse));
+                grapheActuel.creerGrapheAlea(Integer.parseInt(reponse));
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 } catch (java.lang.NumberFormatException ex) {
                     if (!"".equals(reponse)) {
@@ -431,6 +405,7 @@ public class MaFenetre extends JFrame {
     
     private void popup_nouv_t() throws NombreVehiculeInvalideException {
         coutEtTrajet.setText("");
+        coutEtTrajetV2.setText("");
         chemin.clearVisualisations();
         String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Quel type de trajet voulez-vous ?", "Choix du trajet", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
@@ -454,7 +429,7 @@ public class MaFenetre extends JFrame {
                     case 1:
                         chemin.cheminDureeEstimeeDijkstra(depart, arrivee);
                         chemin.visualisationChemin("dureeEstimee");
-                        coutEtTrajet.setForeground(Color.GREEN);
+                        coutEtTrajet.setForeground(Color.decode("#07b817"));
                         coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
                         break;
                     default:
@@ -466,25 +441,24 @@ public class MaFenetre extends JFrame {
             case 1:
                 String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
                 int NbV = Integer.parseInt(choixNbV);
-                
                 switch (NbV) {
                     case 1:
                         String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
                         int TypeCentres  = JOptionPane.showOptionDialog(this, "Quel type de centre voulez vous dans votre tournée?", "Choix du type des centres de la tournée", 0, JOptionPane.QUESTION_MESSAGE, null, choixTypeCentres, choixTypeCentres[3]) ;
                         
-                        String type = null;
+                        String type;
                         switch(TypeCentres){
-                            case 0 : type = "N"; break;
-                            case 1 : type = "M"; break;
-                            case 2 : type = "O"; break;
-                            case 3 : type = null; break;
-                            default : type = null; break;
+                            case 0 : type = "N"; coutEtTrajet.setForeground(Color.decode("#6ac666")); break;
+                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#ee0bdc")); break;
+                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#5f97f7")); break;
+                            default : type = null; coutEtTrajet.setForeground(Color.black); break;
                         }
                         tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
                         tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
                         tournee1V.colorierTourneeUnVehicule(0);
-                        coutEtTrajet.setForeground(Color.MAGENTA);
                         coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
+                        tournee1V.afficherTournee(0);
+                        
                         
                         break;
                     case 2:
@@ -494,9 +468,13 @@ public class MaFenetre extends JFrame {
                         tournee2V.colorierTourneeUnVehicule(0);
                         tournee2V.colorierTourneeUnVehicule(1);
                         
-                        coutEtTrajet.setForeground(Color.RED);
-                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0) + " Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        coutEtTrajet.setForeground(Color.black);
+                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0));
+                        coutEtTrajetV2.setForeground(Color.decode("#b4083e"));
+                        coutEtTrajetV2.setText(" Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
                         
+                        tournee2V.afficherTournee(0);
+                        tournee2V.afficherTournee(1);
                         break;
                     default:
                         throw new NombreVehiculeInvalideException();
@@ -505,7 +483,8 @@ public class MaFenetre extends JFrame {
             case 2:break;
                 
             default:
-                throw new IllegalStateException("Unexpected value: " + choix);
+                break;
+//                throw new IllegalStateException("Unexpected value: " + choix);
                 //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT IL FAUT PEUT ETRE METTRE UN DEFAULT EXIT OU JS QUOI
         }
     }
@@ -513,13 +492,23 @@ public class MaFenetre extends JFrame {
     private void recharger_infos(){
         testGraphPresent();
         coutEtTrajet.setText("");
+        coutEtTrajetV2.setText("");
         grapheActuel.visualisationGraphe();
-        nbCentresParType();
+        labelCentresParType();
         
         seuil_test.setValue(0.2);
     }
     
-    private void nbCentresParType(){
+    /**
+     * Compte le nombre de centres de chaque type présents dans le graphe actuel.
+     *
+     * @return un tableau d'entiers contenant respectivement le nombre de centres de type
+     * Nutrition (indice 0), Maternité (indice 1) et Bloc opératoire (indice 2)
+     *
+     * @author Balsan Agathe
+     */
+    public int[] nbCentresParType() {
+        int[] tabNbParTypes = new int[3];
         int nu = 0, m = 0, o = 0;
         for(Node n : grapheActuel.getEachNode()){
             if(n.getAttribute("type").equals("N"))
@@ -531,9 +520,17 @@ public class MaFenetre extends JFrame {
             else
                 throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
         }
-        nbr_bo.setText("" + o);
-        nbr_m.setText("" + m);
-        nbr_n.setText("" +  nu); 
+        
+        tabNbParTypes[0] = nu;
+        tabNbParTypes[1] = m;
+        tabNbParTypes[2] = o;
+        return tabNbParTypes;
+    }
+    
+    private void labelCentresParType(){
+        nbr_bo.setText("" + nbCentresParType()[2]);
+        nbr_m.setText("" + nbCentresParType()[1]);
+        nbr_n.setText("" +  nbCentresParType()[0]); 
     }
     
     private void testGraphPresent() {
@@ -583,7 +580,7 @@ public class MaFenetre extends JFrame {
             } else {
                 route.addAttribute("ui.label", label);
             }
-            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
+            route.addAttribute("ui.style", "text-size: 15;");       //LALIGNEMENT NE MARCHE PAS 
         }
     }
     
@@ -607,12 +604,9 @@ public class MaFenetre extends JFrame {
                 }
                 label += route.getAttribute("distance") + " km";
             }
-
             
-                route.addAttribute("ui.label", label);
-            
-            route.addAttribute("ui.style", "text-size: 15; text-alignment : along; ");       //LALIGNEMENT NE MARCHE PAS 
-        
+            route.addAttribute("ui.label", label);
+            route.addAttribute("ui.style", "text-size: 15;");       //LALIGNEMENT NE MARCHE PAS
     }
     
     private void labelCheckCentres(){
@@ -626,7 +620,7 @@ public class MaFenetre extends JFrame {
                 if(!label.equals("")){
                     label += " | ";
                 }
-                label += grapheActuel.getTypeComplet(centre);
+                label += centre.getAttribute("type");
             }
             centre.addAttribute("ui.label", label);
         }
@@ -639,8 +633,7 @@ public class MaFenetre extends JFrame {
                 double seuil = (double) seuil_test.getValue();
                 if (fiaRoute < seuil) {
                     route.addAttribute("ui.label", " ⚠ ");
-                    route.addAttribute("ui.style", "text-size: 25; icon: dyn-icon; icon-mode: at-left; ");
-                    route.addAttribute("ui.icon", "attention.jpg");
+                    route.addAttribute("ui.style", "text-size: 25;");
                 }
                 else {
                     labelCheckUneRoute(route);
@@ -665,13 +658,14 @@ public class MaFenetre extends JFrame {
     private void gererTailleTextes(){
         Font police = new Font("Arial", Font.ROMAN_BASELINE, 16);
         Font policeTitre = new Font("Arial", Font.BOLD, 17);
-        //Partie Haut Nouvelle-map
+        //PARTIE HAUT
+        //Nouvelle-map
         nom_m.setFont(policeTitre);
         btNouvelle_map.setFont(police);
-        //Partie Haut Véhicules
+        //Véhicules
         vehicule.setFont(policeTitre);
         intervention.setFont(police);
-        //Partie Haut Centres
+        //Centres
         type_centre.setFont(policeTitre);
         nutrition.setFont(police);
         nbr_n.setFont(police);
@@ -682,13 +676,14 @@ public class MaFenetre extends JFrame {
         bloc_operatoire.setFont(police);
         nbr_bo.setFont(police);
         couleur_bo.setFont(police);
-        //Partie Haut Nouveau trajets
+        //Nouveau trajets
          btNouveau_trajet.setFont(police);
-         //Map
+         //MAP
          coutEtTrajet.setFont(police);
-         //Partie Est 
+         coutEtTrajetV2.setFont(police);
+         //PARTIE EST 
         titreComboC.setFont(policeTitre);
-        //Menu
+        //MENU
         menuCentres.setFont(policeTitre);
         menuRoutes.setFont(policeTitre);
         menuSeuil.setFont(policeTitre);
