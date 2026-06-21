@@ -361,6 +361,9 @@ public class MaFenetre extends JFrame {
         });
     }
     
+    /**
+     * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
+     */
     private void popup_nouv_district() throws IOException{
         String[] options = {"Import", "Création aléatoire", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Comment voulez vous créer votre nouveau district ?", "Choix du district", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -371,13 +374,14 @@ public class MaFenetre extends JFrame {
                 f.setFileFilter(filtre);
                 
                 if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    String fichier = f.getSelectedFile().getName();
-                    
+                    String fichier = f.getSelectedFile().getAbsolutePath();
+
                     grapheActuel.clear();
                     grapheActuel.chargerGraphe(fichier);
-                    nom_m.setText("District du fichier " + fichier);
+                    nom_m.setText("District du fichier " + f.getSelectedFile().getName());
+                } else {
+                    JOptionPane.showMessageDialog(this, "Aucun fichier sélectionné.", "Import annulé", JOptionPane.INFORMATION_MESSAGE );
                 }
-                //else //BIEN METTRE UNE EXCEPTION
                 break;
 
             case 1:
@@ -388,8 +392,8 @@ public class MaFenetre extends JFrame {
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 } catch (java.lang.NumberFormatException ex) {
                     if (!"".equals(reponse)) {
-                        System.out.println("Valeur trop grande : "+ reponse);
-                        JOptionPane.showMessageDialog(this, "Valeur trop grande : "+reponse, "Erreur", JOptionPane.ERROR_MESSAGE);
+                        System.out.println("Valeur incorrect : "+ reponse);
+                        JOptionPane.showMessageDialog(this, "Valeur incorrect : "+reponse, "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                     else {
                         System.out.println("Pas de valeur rentrée");
@@ -403,6 +407,10 @@ public class MaFenetre extends JFrame {
         recharger_infos();
     }
     
+    /**
+     * @exception NombreVehiculeInvalideException
+     * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
+     */
     private void popup_nouv_t() throws NombreVehiculeInvalideException {
         coutEtTrajet.setText("");
         coutEtTrajetV2.setText("");
@@ -414,8 +422,19 @@ public class MaFenetre extends JFrame {
             case 0:
                 String choixDepart  = JOptionPane.showInputDialog( null, "De quel centre voulez vous partir", "Choix du départ du chemin", JOptionPane.QUESTION_MESSAGE) ;
                 String choixArrivee  = JOptionPane.showInputDialog( null, "A quel centre voulez vous arriver", "Choix de l'arrivée du chemin", JOptionPane.QUESTION_MESSAGE) ;
+                
+                if (choixDepart == null || choixArrivee == null || choixDepart.isEmpty() || choixArrivee.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Le centre de départ ou le centre d'arrivée n'a pas été renseigné.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+                
                 Node depart = grapheActuel.getNode(choixDepart.toUpperCase());
                 Node arrivee = grapheActuel.getNode(choixArrivee.toUpperCase());
+
+                if (depart == null || arrivee == null) {
+                    JOptionPane.showMessageDialog(this, "Le centre de départ ou le centre d'arrivée n'existe pas.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
                 
                 String[] optionsCh = {"Chemin le plus rapide", "Chemin rapide et fiable", "Annuler"};
                 int choixCh = JOptionPane.showOptionDialog(this, "Quel type de chemin voulez-vous ?", "Choix du chemin", 0, JOptionPane.QUESTION_MESSAGE, null, optionsCh, optionsCh[2]);
@@ -433,14 +452,27 @@ public class MaFenetre extends JFrame {
                         coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
                         break;
                     default:
-                        throw new AssertionError();
-                        //FAIRE UNE EXCEPTION POUR DIRE QUE LES CHEMINS DE D2PART ET ARRIVEES N4EXISTENT PAS OU AUTRE ERREURS
+                        break;
                 }
                 break;
 
             case 1:
                 String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
-                int NbV = Integer.parseInt(choixNbV);
+                
+                if (choixNbV == null || choixNbV.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Aucun nombre de véhicules renseigné.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+
+                int NbV;
+
+                try {
+                    NbV = Integer.parseInt(choixNbV);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Le nombre de véhicules doit être un nombre entier.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+
                 switch (NbV) {
                     case 1:
                         String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
@@ -484,8 +516,6 @@ public class MaFenetre extends JFrame {
                 
             default:
                 break;
-//                throw new IllegalStateException("Unexpected value: " + choix);
-                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT IL FAUT PEUT ETRE METTRE UN DEFAULT EXIT OU JS QUOI
         }
     }
     

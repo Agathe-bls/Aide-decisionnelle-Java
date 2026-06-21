@@ -12,6 +12,16 @@ import java.util.Scanner;
 //Création graphe aléatoire
 import java.util.random.RandomGenerator;
 
+/**
+ * Représente le graphe des centres de santé.
+ * 
+ * Cette classe hérite de SingleGraph et permet de charger un graphe depuis
+ * un fichier CSV, de générer un graphe aléatoire, de visualiser les centres
+ * selon leur type et de préparer les données utilisées dans les tableaux
+ * d'informations.
+ *
+ * @author Mattis et Agathe
+ */
 public class MonGraphe extends SingleGraph {
 
     private boolean estVide;
@@ -66,6 +76,18 @@ public class MonGraphe extends SingleGraph {
     }
 
 //Import des graphes des fichiers
+
+    /**
+     * Lit un fichier CSV décrivant un graphe et récupère les lignes utiles.
+     * 
+     * Les lignes vides et les lignes commençant par "//" sont ignorées.
+     *
+     * @param nomFichier nom ou chemin du fichier CSV à lire
+     *
+     * @return liste des lignes utiles du fichier
+     *
+     * @author Mattis
+     */
     private static ArrayList<String> lireCSV(String nomFichier) {
         ArrayList<String> lignes = new ArrayList<>();
         try {
@@ -85,6 +107,16 @@ public class MonGraphe extends SingleGraph {
         return lignes;
     }
 
+    /**
+     * Crée les centres du graphe à partir des lignes du fichier CSV.
+     * 
+     * Chaque ligne correspond à un centre. L'identifiant du centre et son type
+     * sont récupérés dans les premières colonnes de la ligne.
+     *
+     * @param lignes lignes utiles du fichier CSV
+     *
+     * @author Mattis
+     */
     private void creerCentres(ArrayList<String> lignes) {
         for (int i = 0; i < lignes.size(); i++) {
             String[] ligne = lignes.get(i).split(";");
@@ -94,6 +126,16 @@ public class MonGraphe extends SingleGraph {
         }
     }
 
+    /**
+     * Crée les routes du graphe à partir des lignes du fichier CSV.
+     * 
+     * Chaque route est ajoutée entre deux centres et reçoit les attributs
+     * fiabilité, distance et durée.
+     *
+     * @param lignes lignes utiles du fichier CSV
+     *
+     * @author Mattis
+     */
     private void creerRoutes(ArrayList<String> lignes) {
 
         for (int i = 0; i < lignes.size(); i++) {
@@ -113,10 +155,25 @@ public class MonGraphe extends SingleGraph {
         }
     }
 
-    public void chargerGraphe(String nomFichier) {
+    /**
+     * Charge un graphe à partir d'un fichier CSV.
+     * 
+     * Le graphe courant est d'abord vidé, puis les centres et les routes sont
+     * créés à partir du contenu du fichier.
+     *
+     * @param nomFichier nom ou chemin du fichier CSV à charger
+     *
+     * @throws IllegalArgumentException si le fichier CSV est vide ou introuvable
+     *
+     * @author Mattis
+     */
+    public void chargerGraphe(String nomFichier) throws IllegalArgumentException {
         this.clear();
 
         ArrayList<String> lignes = lireCSV(nomFichier);
+        if (lignes.isEmpty()) {
+            throw new IllegalArgumentException("Le fichier CSV est vide ou introuvable.");
+        }
         creerCentres(lignes);
         creerRoutes(lignes);
         this.estVide = false;
