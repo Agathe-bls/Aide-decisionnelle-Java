@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) { 
         
-    MaFenetre f = new MaFenetre();
+    new MaFenetre();
 //déplacer les sommets 
     }
 }
