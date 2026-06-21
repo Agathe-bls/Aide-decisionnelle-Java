@@ -25,8 +25,13 @@ public class Chemin {
     private ArrayList<Edge> routesTraversees;
 
     /**
+     * Construit un chemin associé à un graphe donné. Initialise les différentes
+     * caractéristiques du chemin.
      *
-     * @param grapheAssocie
+     * @param grapheAssocie graphe sur lequel les calculs des chemins seront
+     * effectués
+     *
+     * @author Balsan Agathe
      */
     public Chemin(MonGraphe grapheAssocie) {
         this.grapheAssocie = grapheAssocie;
@@ -36,60 +41,77 @@ public class Chemin {
         this.centresTraverses = new ArrayList<>();
         this.routesTraversees = new ArrayList<>();
     }
-    
+
     /**
+     * Retourne la distance totale en km du chemin.
      *
-     * @return
+     * @return la distance totale parcourue
+     *
+     * @author Balsan Agathe
      */
     public int getDistanceTotale() {
         return distanceTotale;
     }
 
     /**
+     * Retourne la durée totale en minutes du chemin.
      *
-     * @return
+     * @return la durée totale du trajet
+     *
+     * @author Balsan Agathe
      */
     public int getDureeTotale() {
         return dureeTotale;
     }
 
     /**
+     * Retourne la durée estimée en minutes du chemin.
      *
-     * @return
+     * @return la durée estimée du trajet
+     *
+     * @author Balsan Agathe
      */
+
     public double getDureeEstimee() {
         return dureeEstimee;
     }
 
     /**
+     * Retourne la liste des centres traversés durant le chemin sous forme textuelle avec les identifiants des centres.
      *
-     * @return
+     * @return une chaîne décrivant l'ordre des centres parcourus
+     *
+     * @author Balsan Agathe
      */
     public String getCentresTraverses() {
         String resultat = "";
         for (Node n : centresTraverses) {
-            if (centresTraverses.get(0) == n)
+            if (centresTraverses.get(0) == n) {
                 resultat = n.getId();
-            else 
+            } else {
                 resultat = n.getId() + " > " + resultat;
+            }
         }
         resultat = "Chemin pris : " + resultat;
         return resultat;
     }
-    
+
 //    @Override
 //    public String toString() {
 //        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
 //                + dureeEstimee + "]";
 //    }
-
-    /**
-     *
-     * @param depart
-     * @param arrivee
-     * @return
-     */
     
+    /**
+     * Calcule le chemin de durée minimale entre deux centres à l'aide de l'algorithme de Dijkstra.
+     *
+     * @param depart centre de départ du chemin
+     * @param arrivee centre d'arrivée du chemin
+     *
+     * @return le chemin correspondant à la durée minimale du chemin en minutes
+     *
+     * @author Balsan Agathe
+     */
     public Chemin cheminDureeMinDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
 
@@ -130,13 +152,17 @@ public class Chemin {
         return this;
     }
 
-    //plus sur et plus rapide => duréeestimée = durée*(20-fiabilité)/10
-
     /**
+     * Calcule le chemin minimisant la durée estimée avec les fiabilités des routes entre deux centres à l'aide
+     * de l'algorithme de Dijkstra.
+     * La durée estimée étant égale à : durée * (20-fiabilité)/10
      *
-     * @param depart
-     * @param arrivee
-     * @return
+     * @param depart centre de départ
+     * @param arrivee centre d'arrivée
+     *
+     * @return le chemin correspondant à la durée estimée minimale
+     *
+     * @author Balsan Agathe
      */
     public Chemin cheminDureeEstimeeDijkstra(Node depart, Node arrivee) {
         HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra = initAlgoDijkstra(depart);
@@ -155,13 +181,13 @@ public class Chemin {
                         infosTableauDijkstra.get(voisin).coutCalcule = EstimationAvecVoisin;
                         infosTableauDijkstra.get(voisin).centrePrecedent = nTraite;
                     }
-                }                
+                }
             }
             infosTableauDijkstra.get(nTraite).estTraite = true;
         }
         //en partant du centre d'arrivée trouver toutes les informations pour avoir les infos du chemin final
         Node debut = arrivee;
-        this.dureeEstimee = ((int)(infosTableauDijkstra.get(debut).coutCalcule));
+        this.dureeEstimee = ((int) (infosTableauDijkstra.get(debut).coutCalcule));
         while (debut != depart) {
             Edge entreDeux = debut.getEdgeBetween(infosTableauDijkstra.get(debut).centrePrecedent);
             this.centresTraverses.add(debut);
@@ -178,11 +204,8 @@ public class Chemin {
         return this;
     }
 
-    //LES FONCTIONS SECONDAIRES UTILISEES POUR L'ALGO :
-
-    /**
-     *
-     */
+//FONCTIONS SECONDAIRES UTILISEES POUR L'ALGO :
+    
     public class InfosCentresDijkstra {
 
         private double coutCalcule;
@@ -190,7 +213,11 @@ public class Chemin {
         private boolean estTraite;
 
         /**
+         * Construit une structure de données utilisée par l'algorithme de
+         * Dijkstra pour stocker les informations associées à un centre.
+         * Le cout, le centre qui le précède pour y arriver et s'il est traité ou non.
          *
+         * @author Balsan Agathe
          */
         public InfosCentresDijkstra() {
             this.coutCalcule = Double.POSITIVE_INFINITY;
@@ -242,10 +269,13 @@ public class Chemin {
         return centreMin;
     }
 
-//Visualisations : 
+//VISUALISATION : 
     /**
+     * Met en évidence graphiquement le chemin calculé selon le type de chemin sélectionné.
      *
-     * @param typeChemin
+     * @param typeChemin type du chemin à visualiser ("dureeMin" ou "dureeEstimee")
+     *
+     * @author Balsan Agathe
      */
     public void visualisationChemin(String typeChemin) {
         if (typeChemin.equals("dureeMin")) {
@@ -258,10 +288,13 @@ public class Chemin {
             }
         }
     }
-    
+
     /**
+     * Met en évidence graphiquement une tournée en fonction du véhicule sélectionné.
      *
-     * @param nbVehicule
+     * @param nbVehicule numéro du véhicule dont la tournée doit être visualisée (soit le 1 soit le 2)
+     *
+     * @author Balan Agathe
      */
     public void visualisationTournee(int nbVehicule) {
         switch (nbVehicule) {
@@ -276,7 +309,7 @@ public class Chemin {
                 for (Edge e : routesTraversees) {
                     e.setAttribute("ui.style", "fill-color: #b4083e; size: 3px;");
                 }
-                centresTraverses.get(0).addAttribute("ui.label", ""+centresTraverses.get(0).getId());
+                centresTraverses.get(0).addAttribute("ui.label", "" + centresTraverses.get(0).getId());
                 centresTraverses.get(0).addAttribute("ui.style", "text-size: 20px;");
                 break;
 
@@ -286,7 +319,9 @@ public class Chemin {
     }
 
     /**
+     * Réinitialise l'affichage du graphe en supprimant les visualisations actuelles des chemins et tournées.
      *
+     * @author Balsan Agathe
      */
     public void clearVisualisations() {
         grapheAssocie.visualisationGraphe();

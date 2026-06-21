@@ -42,24 +42,24 @@ import saejava.classes.MonGraphe;
 import saejava.classes.Chemin;
 import saejava.classes.Tournee;
 
-/**
- *
- * @author Auryann / Agathe
- */
 public class MaFenetre extends JFrame {
-    
+
+//PARTIE MAP
     private DefaultView view;
+    private final MonGraphe grapheActuel = new MonGraphe("gActuel"); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    private JPanel pMap;
     
-    //Partie Haut Nouvelle-map
+//PARTIE HAUT
+    //Nouvelle-map
     private JLabel nom_m;
     private JButton btNouvelle_map;
     public static JFileChooser f;
     
-    //Partie Haut Vehicules
+    //Vehicules
     private JLabel vehicule;
     private JLabel intervention;
     
-    //Partie Haut Centres
+    //Centres
     private JLabel type_centre;
     private JLabel nutrition;
     private JLabel nbr_n;
@@ -71,16 +71,11 @@ public class MaFenetre extends JFrame {
     private JLabel nbr_bo;
     private JPanel couleur_bo;
     
-    //Map
-    private final MonGraphe grapheActuel = new MonGraphe("gActuel"); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
-    private JPanel pMap;
-    
-    //Partie Haut Nouveau trajets
+    //Nouveau trajets
     private JButton btNouveau_trajet;
-    
     private final Chemin chemin = new Chemin(grapheActuel); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
     
-    //PARTIE BAS
+//PARTIE BAS
     private JLabel coutEtTrajet;
     private JLabel coutEtTrajetV2;
     private JScrollPane scrollPane;
@@ -89,10 +84,10 @@ public class MaFenetre extends JFrame {
     private Tournee tournee1V;
     private Tournee tournee2V;
     
-    //Partie Est 
+//PARTIE EST 
     private JLabel titreComboC;
     
-    //Menu
+//MENU
     private JMenuBar menuBar;
     private JMenu menuCentres;
     private JMenu menuRoutes;
@@ -104,11 +99,15 @@ public class MaFenetre extends JFrame {
     private JCheckBoxMenuItem checkDistance;
     private JSpinner seuil_test;
     
-    //popup info centre
+//Infos au clic
     private PopupInfosCentres popupInfoC;
 
     /**
-     * 
+     * Construit la fênetre principalede l'application.
+     * Initialise l'interface graphique, son menu, ses composants, ses écouteurs, ses paramètres d'affichage ainsi que la visualisation initiale du graphe.
+     * La fenêtre est ensuite étendue sur tout l'écrant et rendue visible.
+     *
+     * @author Balsan Agathe
      */
     public MaFenetre(){
         super("MedicOne");
@@ -128,10 +127,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void créationMenu(){
-        /**
-         * 
-         * @author Agathe
-         */
         menuBar = new JMenuBar();
         MaFenetre.this.setJMenuBar(menuBar);
         
@@ -162,12 +157,7 @@ public class MaFenetre extends JFrame {
         menuBar.add(menuSeuil);
     }
     
-    private void initComposants(){
-        /**
-         * 
-         * @author Auryann(modèle est) / Agathe
-         */
-                
+    private void initComposants(){ 
         JPanel pPrincipal = new JPanel(new BorderLayout());
         
         //PARTIE HAUT 
@@ -198,7 +188,7 @@ public class MaFenetre extends JFrame {
         pHaut.add(intervention, gbcHaut);
         gbcHaut.gridheight = 1;
         
-        //Type De Centre
+        //Centres
         gbcHaut.insets = new Insets(5, 20, 5, 20); // Pour ne pas avoir trop d'espaces entre les infos des centres
         type_centre = new JLabel("Type De Centre", JLabel.CENTER);
         nutrition = new JLabel("Nutrition");
@@ -255,7 +245,6 @@ public class MaFenetre extends JFrame {
         
         pPrincipal.add(pHaut, BorderLayout.NORTH);
         
-        //PARTIE CENTRE
         //MAP
         pMap = new JPanel(new BorderLayout());
         pMap.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -268,7 +257,6 @@ public class MaFenetre extends JFrame {
         pMap.add((Component) this.view, BorderLayout.CENTER);
         
         pPrincipal.add(pMap,BorderLayout.CENTER);
-        
         
         //PARTIE BAS
         JPanel pBas = new JPanel(new BorderLayout());
@@ -286,8 +274,7 @@ public class MaFenetre extends JFrame {
         pBas.add(scrollPaneV2, BorderLayout.EAST);
         scrollPaneV2.getViewport().setBackground(Color.WHITE);
         
-        pPrincipal.add(pBas, BorderLayout.SOUTH);        
-              
+        pPrincipal.add(pBas, BorderLayout.SOUTH);
         
         //PARTIE EST 
         JPanel pEst = new JPanel(new GridBagLayout());
@@ -308,11 +295,7 @@ public class MaFenetre extends JFrame {
     }
     
     private void initEcouteurs() {
-        /**
-         *
-         * @author Auryann / Agathe
-         */
-        //Partie Haut
+        //PARTIE HAUT
         btNouvelle_map.addActionListener((ActionEvent e) -> {
             try {
                 popup_nouv_district();
@@ -349,7 +332,7 @@ public class MaFenetre extends JFrame {
         //Nouveau trajet 
         btNouveau_trajet.addActionListener(e -> popup_nouv_t());
 
-        //Menu
+        //MENU
         checkFia.addActionListener((ActionEvent e) -> {
             labelCheckRoutes();
         });
@@ -370,10 +353,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void popup_nouv_district() throws IOException{
-        /**
-         * 
-         * @author Agathe
-         */
         String[] options = {"Import", "Création aléatoire", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Comment voulez vous créer votre nouveau district ?", "Choix du district", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
         switch (choix) {
@@ -409,10 +388,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void popup_nouv_t(){
-        /**
-         * 
-         * @author Agathe
-         */
         intervention.setText("0 véhicules en tournée");
         coutEtTrajet.setText("");
         coutEtTrajetV2.setText("");
@@ -502,10 +477,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void recharger_infos(){
-        /**
-         * 
-         * @author Agathe
-         */
         testGraphPresent();
         coutEtTrajet.setText("");
         coutEtTrajetV2.setText("");
@@ -515,11 +486,15 @@ public class MaFenetre extends JFrame {
         seuil_test.setValue(0.2);
     }
     
-    public int[] nbCentresParType(){
-        /**
-         * 
-         * @author Agathe
-         */
+    /**
+     * Compte le nombre de centres de chaque type présents dans le graphe actuel.
+     *
+     * @return un tableau d'entiers contenant respectivement le nombre de centres de type
+     * Nutrition (indice 0), Maternité (indice 1) et Bloc opératoire (indice 2)
+     *
+     * @author Balsan Agathe
+     */
+    public int[] nbCentresParType() {
         int[] tabNbParTypes = new int[3];
         int nu = 0, m = 0, o = 0;
         for(Node n : grapheActuel.getEachNode()){
@@ -540,21 +515,12 @@ public class MaFenetre extends JFrame {
     }
     
     private void labelCentresParType(){
-        /**
-         * 
-         * @author Agathe
-         */
-        
         nbr_bo.setText("" + nbCentresParType()[2]);
         nbr_m.setText("" + nbCentresParType()[1]);
         nbr_n.setText("" +  nbCentresParType()[0]); 
     }
     
     private void testGraphPresent() {
-        /**
-         * 
-         * @author Agathe
-         */
         if (grapheActuel.getEstVide() == true) {
             btNouveau_trajet.setEnabled(false);
             checkFia.setEnabled(false);
@@ -575,10 +541,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void labelCheckRoutes(){
-        /**
-         * 
-         * @author Agathe
-         */
         for (Edge route : grapheActuel.getEachEdge()) {
             String label = "";
 
@@ -610,10 +572,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void labelCheckUneRoute(Edge route){
-        /**
-         * 
-         * @author Agathe
-         */
             String label = "";
 
             if (checkFia.isSelected()) {
@@ -639,10 +597,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void labelCheckCentres(){
-        /**
-         * 
-         * @author Agathe
-         */
         for(Node centre : grapheActuel.getEachNode()){
             String label = "";
             
@@ -660,9 +614,6 @@ public class MaFenetre extends JFrame {
     }
     
     private void visuSeuil() {
-        /** 
-         * @author Agathe
-         */
         seuil_test.addChangeListener((ChangeEvent e) -> {
             for (Edge route : grapheActuel.getEachEdge()) {
                 double fiaRoute = (route.getAttribute("fiabilite"));
@@ -679,9 +630,6 @@ public class MaFenetre extends JFrame {
     }
     
     private JPanel InfosCouleursCentres(int type){
-        /** 
-         * @author Agathe
-         */
         JPanel couleur = new JPanel();
         switch(type){
             case 0 : couleur.setBackground(Color.decode("#93FA8F")); break;
@@ -695,18 +643,16 @@ public class MaFenetre extends JFrame {
     }
     
     private void gererTailleTextes(){
-        /** 
-         * @author Agathe
-         */
         Font police = new Font("Arial", Font.ROMAN_BASELINE, 16);
         Font policeTitre = new Font("Arial", Font.BOLD, 17);
-        //Partie Haut Nouvelle-map
+        //PARTIE HAUT
+        //Nouvelle-map
         nom_m.setFont(policeTitre);
         btNouvelle_map.setFont(police);
-        //Partie Haut Véhicules
+        //Véhicules
         vehicule.setFont(policeTitre);
         intervention.setFont(police);
-        //Partie Haut Centres
+        //Centres
         type_centre.setFont(policeTitre);
         nutrition.setFont(police);
         nbr_n.setFont(police);
@@ -717,14 +663,14 @@ public class MaFenetre extends JFrame {
         bloc_operatoire.setFont(police);
         nbr_bo.setFont(police);
         couleur_bo.setFont(police);
-        //Partie Haut Nouveau trajets
+        //Nouveau trajets
          btNouveau_trajet.setFont(police);
-         //Map
+         //MAP
          coutEtTrajet.setFont(police);
          coutEtTrajetV2.setFont(police);
-         //Partie Est 
+         //PARTIE EST 
         titreComboC.setFont(policeTitre);
-        //Menu
+        //MENU
         menuCentres.setFont(policeTitre);
         menuRoutes.setFont(policeTitre);
         menuSeuil.setFont(policeTitre);

@@ -1,23 +1,27 @@
 package saejava.classes;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Scanner;
-
-//Création graphe aléatoire
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
-import java.util.random.RandomGenerator;
+import java.util.ArrayList;
 
+//Import csv
+import java.io.FileInputStream;
+import java.util.Scanner;
+
+//Création graphe aléatoire
+import java.util.random.RandomGenerator;
 
 public class MonGraphe extends SingleGraph {
 
     private boolean estVide;
     
     /**
-     * 
-     * @param id_graphe
+     * Construit un nouveau graphe vide.
+     *
+     * @param id_graphe identifiant du graphe
+     *
+     * @author Balsan Agathe
      */
     public MonGraphe(String id_graphe) {
         super(id_graphe);
@@ -25,17 +29,26 @@ public class MonGraphe extends SingleGraph {
     }
 
     /**
+     * Indique si le graphe est vide ou non.
      *
-     * @return
+     * @return true si le graphe ne contient aucun centre, false sinon
+     *
+     * @author Balsan Agathe
      */
     public boolean getEstVide() {
         return estVide;
     }
 
     /**
+     * Retourne l'intitulé complet du type d'un centre.
      *
-     * @param centre
-     * @return
+     * @param centre centre dont on souhaite connaître le type complet
+     *
+     * @return le nom complet du type du centre ("Nutrition", "Maternité" ou "Bloc opératoire")
+     *
+     * @throws IllegalArgumentException si le type du centre est invalide
+     * 
+     * @author Balsan Agathe
      */
     public String getTypeComplet(Node centre) {
         String res = "";
@@ -109,8 +122,16 @@ public class MonGraphe extends SingleGraph {
 //Création du graphe aléatoire
 
     /**
+     * Génère un graphe aléatoire connexe contenant un nombre donné de centres.
+     * Les types des centres ainsi que les caractéristiques des routes sont attribués aléatoirement. 
+     * Le centre est de type Maternité avec une probabilité de 3/5, et Bloc Opératoire ou Nutrition avec une probabilité de 1/5.
+     * Une route existe avec une probabilité de 1/5.
+     * Sa fiabilité est comprise entre 2/10 et 10/10, sa distance entre 10 et 50 km et sa durée entre 10 et 120 minutes. 
+     * Le graphe généré est garanti connexe grâce à au moins une route de fiabilité supérieure à 0,25 reliant chaque nouveau centre au début de graphe existant.
+     * 
+     * @param N nombre de centres à générer
      *
-     * @param N
+     * @author Balsan Agathe
      */
     public void creerGrapheAlea(int N) {
         ArrayList<Node> noeudsAjoutes = new ArrayList<>();
@@ -182,7 +203,12 @@ public class MonGraphe extends SingleGraph {
     }
 
     /**
+     * Configure l'affichage graphique des centres du graphe en fonction de leur
+     * type en appliquant les couleurs et les labels associés.
      *
+     * @throws IllegalArgumentException si le type du centre est invalide
+     * 
+     * @author Balsan Agathe
      */
     public void visualisationGraphe() {
         for (Node n : this.getNodeSet()) {
@@ -199,16 +225,6 @@ public class MonGraphe extends SingleGraph {
             } else {
                 throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
             }
-        }
-    }
-
-    /**
-     *
-     */
-    public void visualisationRoutes() { // 0 = fiabilité  / 1 = duree / 2 = distance
-        for (Edge e : this.getEachEdge()) {
-            e.addAttribute("ui.label", e.getAttribute("fiabilite"));
-            e.addAttribute("ui.style", "text-size: 20px;");
         }
     }
     
