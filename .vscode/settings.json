@@ -1,7 +1,11 @@
 {
-  "java.project.sourcePaths": ["src"],
+  "java.project.sourcePaths": [
+    "src"
+  ],
   "java.project.outputPath": "bin",
   "java.project.referencedLibraries": [
-    "lib/**/*.jar"
+    "lib/gs-core-1.3.jar",
+    "lib/gs-algo-1.3.jar",
+    "lib/gs-ui-1.3.jar",
   ]
 }
