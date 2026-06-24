@@ -377,6 +377,7 @@ public class MaFenetre extends JFrame {
                     String fichier = f.getSelectedFile().getAbsolutePath();
 
                     try {
+                        grapheActuel.clear();
                         grapheActuel.chargerGraphe(fichier);
                         nom_m.setText("District du fichier " + f.getSelectedFile().getName());
                     } catch (IllegalArgumentException ex) {
@@ -391,8 +392,23 @@ public class MaFenetre extends JFrame {
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 try {
+                int nbCentres = Integer.parseInt(reponse);
+
+                if (nbCentres > 500) {
+                    System.out.println("Erreur : le nombre de centres ne peut pas dépasser 500.");
+
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Le nombre de centres ne peut pas dépasser 500.",
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+
+                    break;
+                }
+
                 grapheActuel.clear();
-                grapheActuel.creerGrapheAlea(Integer.parseInt(reponse));
+                grapheActuel.creerGrapheAlea(nbCentres);
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 } catch (java.lang.NumberFormatException ex) {
                     if (!"".equals(reponse)) {
