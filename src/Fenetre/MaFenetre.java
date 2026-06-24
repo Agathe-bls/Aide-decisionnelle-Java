@@ -376,9 +376,13 @@ public class MaFenetre extends JFrame {
                 if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     String fichier = f.getSelectedFile().getAbsolutePath();
 
-                    grapheActuel.clear();
-                    grapheActuel.chargerGraphe(fichier);
-                    nom_m.setText("District du fichier " + f.getSelectedFile().getName());
+                    try {
+                        grapheActuel.chargerGraphe(fichier);
+                        nom_m.setText("District du fichier " + f.getSelectedFile().getName());
+                    } catch (IllegalArgumentException ex) {
+                        System.out.println("Erreur : " + ex.getMessage());
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur import CSV", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(this, "Aucun fichier sélectionné.", "Import annulé", JOptionPane.INFORMATION_MESSAGE );
                 }
