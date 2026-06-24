@@ -34,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
@@ -101,7 +102,7 @@ public class MaFenetre extends JFrame {
     private JCheckBoxMenuItem checkFia;
     private JCheckBoxMenuItem checkDuree;
     private JCheckBoxMenuItem checkDistance;
-    private JSpinner seuil_test;
+    private JSpinner seuil_cpt;
     
 //Infos au clic
     private PopupInfosCentres popupInfoC;
@@ -122,12 +123,16 @@ public class MaFenetre extends JFrame {
         créationMenu();
         initComposants();
         initEcouteurs();
-        testGraphPresent();
+        siGraphPresent();
         visuSeuil();
         gererTailleTextes();
         
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
+    }
+    
+    public MonGraphe getGrapheActuel() {
+        return grapheActuel;
     }
     
     private void créationMenu(){
@@ -144,8 +149,8 @@ public class MaFenetre extends JFrame {
         checkFia = new JCheckBoxMenuItem("Fiabilités");
         checkDuree = new JCheckBoxMenuItem("Durées");
         checkDistance = new JCheckBoxMenuItem("Distances");
-        seuil_test = new JSpinner(new SpinnerNumberModel(0.1,0.1,1,0.1));
-        seuil_test.setPreferredSize(new Dimension(173,20));
+        seuil_cpt = new JSpinner(new SpinnerNumberModel(0,0,1,0.1));
+        seuil_cpt.setPreferredSize(new Dimension(173,20));
         
         menuCentres.add(checkNom);
         menuCentres.add(checkType);
@@ -154,7 +159,7 @@ public class MaFenetre extends JFrame {
         menuRoutes.add(checkDuree);
         menuRoutes.add(checkDistance);
         
-        menuSeuil.add(seuil_test);
+        menuSeuil.add(seuil_cpt);
         
         menuBar.add(menuCentres);
         menuBar.add(menuRoutes);
@@ -386,15 +391,21 @@ public class MaFenetre extends JFrame {
 
         //MENU
         checkFia.addActionListener((ActionEvent e) -> {
-            labelCheckRoutes();
+            for (Edge route : grapheActuel.getEachEdge()) {
+                labelCheckRoute(route);
+            }
         });
         checkDuree.addActionListener((ActionEvent e) -> {
-            labelCheckRoutes();
+            for (Edge route : grapheActuel.getEachEdge()) {
+                labelCheckRoute(route);
+            }
         });
         checkDistance.addActionListener((ActionEvent e) -> {
-            labelCheckRoutes();
+            for (Edge route : grapheActuel.getEachEdge()) {
+                labelCheckRoute(route);
+            }
         });
-        
+
         checkNom.addActionListener((ActionEvent e) -> {
             labelCheckCentres();
         });
@@ -551,14 +562,15 @@ public class MaFenetre extends JFrame {
     }
     
     private void recharger_infos(){
-        testGraphPresent();
+        siGraphPresent();
         coutEtTrajet.setText("");
         coutEtTrajetV2.setText("");
         grapheActuel.visualisationGraphe();
         labelCentresParType();
+
         mettreAJourListeEst();
         
-        seuil_test.setValue(0.2);
+        seuil_cpt.setValue(0.1);
     }
     
     /**
@@ -595,7 +607,7 @@ public class MaFenetre extends JFrame {
         nbr_n.setText("" +  nbCentresParType()[0]); 
     }
     
-    private void testGraphPresent() {
+    private void siGraphPresent() {
         if (grapheActuel.getEstVide() == true) {
             btNouveau_trajet.setEnabled(false);
             checkFia.setEnabled(false);
@@ -603,7 +615,7 @@ public class MaFenetre extends JFrame {
             checkDistance.setEnabled(false);
             checkNom.setEnabled(false);
             checkType.setEnabled(false);
-            seuil_test.setEnabled(false);
+            seuil_cpt.setEnabled(false);
         } else {
             btNouveau_trajet.setEnabled(true);
             checkFia.setEnabled(true);
@@ -611,42 +623,18 @@ public class MaFenetre extends JFrame {
             checkDistance.setEnabled(true);
             checkNom.setEnabled(true);
             checkType.setEnabled(true);
-            seuil_test.setEnabled(true);
+            seuil_cpt.setEnabled(true);
+            
+            checkFia.setSelected(false);
+            checkDuree.setSelected(false);
+            checkDistance.setSelected(false);
+            checkNom.setSelected(true);
+            checkType.setSelected(false);
+            seuil_cpt.setValue(0.1);
         }
     }
     
-    private void labelCheckRoutes(){
-        for (Edge route : grapheActuel.getEachEdge()) {
-            String label = "";
-
-            if (checkFia.isSelected()) {
-                label += route.getAttribute("fiabilite") + " fia";
-            }
-
-            if (checkDuree.isSelected()) {
-                if (!label.equals("")) {
-                    label += " | ";
-                }
-                label += route.getAttribute("duree") + " min";
-            }
-
-            if (checkDistance.isSelected()) {
-                if (!label.equals("")) {
-                    label += " | ";
-                }
-                label += route.getAttribute("distance") + " km";
-            }
-
-            if (label.equals("")) {
-                route.removeAttribute("ui.label");
-            } else {
-                route.addAttribute("ui.label", label);
-            }
-            route.addAttribute("ui.style", "text-size: 15;");       //LALIGNEMENT NE MARCHE PAS 
-        }
-    }
-    
-    private void labelCheckUneRoute(Edge route){
+    private String labelCheckRoute(Edge route){
             String label = "";
 
             if (checkFia.isSelected()) {
@@ -668,7 +656,9 @@ public class MaFenetre extends JFrame {
             }
             
             route.addAttribute("ui.label", label);
-            route.addAttribute("ui.style", "text-size: 15;");       //LALIGNEMENT NE MARCHE PAS
+            route.addAttribute("ui.style", "text-size: 15; text-background-mode: plain; text-background-color : white; text-style: bold; text-alignment: along;");
+            
+            return label;
     }
     
     private void labelCheckCentres(){
@@ -689,20 +679,23 @@ public class MaFenetre extends JFrame {
     }
     
     private void visuSeuil() {
-        seuil_test.addChangeListener((ChangeEvent e) -> {
-            for (Edge route : grapheActuel.getEachEdge()) {
-                double fiaRoute = (route.getAttribute("fiabilite"));
-                double seuil = (double) seuil_test.getValue();
-                if (fiaRoute < seuil) {
-                    route.addAttribute("ui.label", " ⚠ ");
-                    route.addAttribute("ui.style", "text-size: 25;");
-                }
-                else {
-                    labelCheckUneRoute(route);
+        seuil_cpt.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                for (Edge route : grapheActuel.getEachEdge()) {
+                    double fiaRoute = (route.getAttribute("fiabilite"));
+                    double seuil = (double) seuil_cpt.getValue();
+                    if (fiaRoute < seuil) {
+                        route.setAttribute("ui.label", " ⚠ ");
+                        route.setAttribute("ui.style", "text-size: 25; text-background-mode: plain; text-background-color : white; text-style: normal; ");
+                    }
+                    else {
+                        labelCheckRoute(route);
+                    }
                 }
             }
         });
-    }
+        }
     
     private JPanel InfosCouleursCentres(int type){
         JPanel couleur = new JPanel();
@@ -754,6 +747,6 @@ public class MaFenetre extends JFrame {
         checkFia.setFont(police);
         checkDuree.setFont(police);
         checkDistance.setFont(police);
-        seuil_test.setFont(police);
+        seuil_cpt.setFont(police);
     }
 }
