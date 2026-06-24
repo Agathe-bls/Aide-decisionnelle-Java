@@ -104,7 +104,7 @@ public class MonGraphe extends SingleGraph {
                     Node n1 = this.getNode(ligne[0]);
                     Node n2 = this.getNode("S" + (j + 1));
                     Edge route = this.addEdge(ligne[0] + "/S" + (j + 1), n1, n2);
-                    route.addAttribute("fiabilite", Double.valueOf(infoRoute[0].trim()));
+                    route.addAttribute("fiabilite", Double.valueOf(infoRoute[0].trim())/10.0);
                     route.addAttribute("distance", Integer.valueOf(infoRoute[1].trim()));
                     route.addAttribute("duree", Integer.valueOf(infoRoute[2].trim()));
                 }
