@@ -699,7 +699,7 @@ public class MaFenetre extends JFrame {
             }
             
             route.addAttribute("ui.label", label);
-            route.addAttribute("ui.style", "text-size: 15; text-background-mode: plain; text-background-color : white; text-style: bold; text-alignment: along;");
+            route.addAttribute("ui.style", "text-size: 15; text-background-mode: rounded-box; text-background-color : white; ");  //text-alignment: along; ne fonctionne pas
             
             return label;
     }
