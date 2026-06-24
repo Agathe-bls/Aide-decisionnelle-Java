@@ -4,7 +4,7 @@
  */
 package Fenetre;
 
-import saejava.ExportCsv;
+//import saejava.ExportCsv;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -47,7 +47,7 @@ import Exceptions.NombreVehiculeInvalideException;
 import saejava.classes.MonGraphe;
 import saejava.classes.Chemin;
 import saejava.classes.Tournee;
-import saejava.ExportCsv;
+//import saejava.ExportCsv;
 
 public class MaFenetre extends JFrame {
 
@@ -555,7 +555,7 @@ public class MaFenetre extends JFrame {
                         tournee1V.colorierTourneeUnVehicule(0);
                         coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
                         tournee1V.afficherTournee(0);
-                        ExportCsv.exporterTournes(tournee1V);
+//                        ExportCsv.exporterTournes(tournee1V);
                         
                         break;
                     case 2:
@@ -573,7 +573,7 @@ public class MaFenetre extends JFrame {
                         tournee2V.afficherTournee(0);
                         tournee2V.afficherTournee(1);
                         
-                        ExportCsv.exporterTournes(tournee2V);
+//                        ExportCsv.exporterTournes(tournee2V);
                         break;
                     default:
                         throw new NombreVehiculeInvalideException();
