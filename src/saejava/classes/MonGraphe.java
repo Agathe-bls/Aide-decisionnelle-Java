@@ -306,6 +306,9 @@ public class MonGraphe extends SingleGraph {
 
         //Ajout des sous-listes dans la liste principale
         ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
+        listeResultat.add(listeMat);  
+        listeResultat.add(listeNutri); 
+        listeResultat.add(listeBo);    
         listeResultat.add(listeMat);
         listeResultat.add(listeNutri);
         listeResultat.add(listeBo);
