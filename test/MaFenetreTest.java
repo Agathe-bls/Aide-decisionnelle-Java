@@ -10,8 +10,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+<<<<<<< HEAD
+=======
 import saejava.classes.MonGraphe;
 
+>>>>>>> 17557051fdf45962adc855096cce0f8fa8830067
 /**
  *
  * @author Agathe
