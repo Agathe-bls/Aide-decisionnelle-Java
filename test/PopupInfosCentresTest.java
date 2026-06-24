@@ -3,12 +3,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit4TestClass.java to edit this template
  */
 
+import Fenetre.MaFenetre;
+import Fenetre.PopupInfosCentres;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import org.graphstream.graph.Node;
+import saejava.classes.MonGraphe;
 
 /**
  *
@@ -35,9 +41,14 @@ public class PopupInfosCentresTest {
     public void tearDown() {
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
+    
+    @Test
+    public void testGetTypeComplet() {
+        MonGraphe graphe = new MonGraphe("test");
+
+        Node n = graphe.addNode("M1");
+        n.setAttribute("type", "M");
+
+        assertEquals("Maternité", graphe.getTypeComplet(n));
+    }
 }

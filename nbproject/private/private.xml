@@ -3,18 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/src/Fenetre/MaFenetre.java</file>
             <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/src/saejava/classes/MonGraphe.java</file>
-            <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/src/saejava/classes/Chemin.java</file>
+            <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/src/Fenetre/MaFenetre.java</file>
             <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/src/saejava/classes/Tournee.java</file>
-=======
-            <file>file:/C:/Users/Agathe/Desktop/Cours/Université/Cours/G4S2A/-%20SAE%20-/01-Développement%20d'une%20application-/saejava/src/saejava/classes/Chemin.java</file>
-            <file>file:/C:/Users/Agathe/Desktop/Cours/Université/Cours/G4S2A/-%20SAE%20-/01-Développement%20d'une%20application-/saejava/src/Fenetre/MaFenetre.java</file>
-            <file>file:/C:/Users/Agathe/Desktop/Cours/Université/Cours/G4S2A/-%20SAE%20-/01-Développement%20d'une%20application-/saejava/src/Fenetre/PopupInfosCentres.java</file>
-            <file>file:/C:/Users/Agathe/Desktop/Cours/Université/Cours/G4S2A/-%20SAE%20-/01-Développement%20d'une%20application-/saejava/src/saejava/classes/MonGraphe.java</file>
-            <file>file:/C:/Users/Agathe/Desktop/Cours/Université/Cours/G4S2A/-%20SAE%20-/01-Développement%20d'une%20application-/saejava/src/Exceptions/FiabiliteTropFaibleException.java</file>
->>>>>>> bbe74d900302db8006740888f6543a4ce7ab5556
+            <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/src/Fenetre/PopupInfosCentres.java</file>
+            <file>file:/C:/Users/zynga/Documents/S2/SAE/SaeJava/test/MaFenetreTest.java</file>
         </group>
     </open-files>
 </project-private>
