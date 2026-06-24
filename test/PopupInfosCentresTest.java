@@ -18,7 +18,7 @@ import saejava.classes.MonGraphe;
 
 /**
  *
- * @author Agathe
+ * @author Auryann
  */
 public class PopupInfosCentresTest {
     
