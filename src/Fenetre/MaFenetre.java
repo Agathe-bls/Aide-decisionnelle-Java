@@ -52,7 +52,7 @@ public class MaFenetre extends JFrame {
 
 //PARTIE MAP
     private DefaultView view;
-    private final MonGraphe grapheActuel = new MonGraphe("gActuel"); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    private final MonGraphe grapheActuel = new MonGraphe("gActuel");
     private JPanel pMap;
     
 //PARTIE HAUT
@@ -79,7 +79,7 @@ public class MaFenetre extends JFrame {
     
     //Nouveau trajets
     private JButton btNouveau_trajet;
-    private final Chemin chemin = new Chemin(grapheActuel); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    private final Chemin chemin = new Chemin(grapheActuel);
     
 //PARTIE BAS
     private JLabel coutEtTrajet;
