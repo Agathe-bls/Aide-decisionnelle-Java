@@ -18,21 +18,38 @@ import org.graphstream.graph.Node;
 import saejava.classes.MonGraphe;
 
 /**
+ * Gère l'affichage d'une boîte de dialogue et de fenêtres graphiques (tableaux)
+ * présentant des informations analytiques sur un centre (nœud) sélectionné du graphe.
+ * Permet d'obtenir les centres les plus proches ou des tableaux de distances et de durées.
  *
- * @author Agathe
+ * @author Auryann
  */
 public class PopupInfosCentres {
+    /** La fenêtre principale de l'application. */
     private MaFenetre fenetreActuelle;
+    
+    /** Le graphe d'étude contenant l'ensemble des nœuds et des arêtes. */
     private MonGraphe grapheActuel;
+    
+    /** Label affichant l'identifiant du centre. */
     private JLabel titre_ic;
+    
+    /** Label affichant le type textuel complet du centre. */
     private JLabel t_nom_ic;
     
+    /**
+     * Constructeur de la classe. Initialise les composants et ouvre immédiatement 
+     * un menu de sélection (OptionDialog) pour guider l'utilisateur vers le type d'affichage désiré.
+     *
+     * @param fenetreA    La fenêtre parente de l'application.
+     * @param grapheA     Le graphe de données actuel.
+     * @param centreClic  Le nœud (centre) qui a été cliqué et sur lequel porte la requête.
+     */
     public PopupInfosCentres(MaFenetre fenetreA, MonGraphe grapheA, Node centreClic){
         fenetreActuelle = fenetreA;
         grapheActuel = grapheA;
         titre_ic = new JLabel("ID :" + centreClic.getId());
         t_nom_ic = new JLabel("Type de centre : " + grapheActuel.getTypeComplet(centreClic));
-        
         
         String[] options = {"Centres les plus proches", "Table des distances", "Tables des durées"};
         int choix = JOptionPane.showOptionDialog(fenetreActuelle, "Id : " + centreClic.getId() + "\nType de centre : " + grapheActuel.getTypeComplet(centreClic) + "\nQuelles informations voulez-vous ? ", "Information du centre", 0, JOptionPane.DEFAULT_OPTION, null, options, options[2]);
@@ -52,13 +69,17 @@ public class PopupInfosCentres {
                 
             default:
                 break;
-                //throw new IllegalStateException("Unexpected value: " + choix);
-                //FAIRE UNE EXCEPTION PAR RAPPORT AU CHOIX INNEXISTANT
-                //JE PENSE QUE CA SUFFIT DE JUSTE SORTIR PARCE QUE ON PEUT QUE CLIQUER DANS LA CROIX SINON ET CROIX = -1
         }
     }
     
-    private void centre_proche(Node n) {
+    /**
+     * Calcule, extrait et affiche dans un tableau graphique (`JTable`) les centres médicaux 
+     * les plus proches (Maternité, Nutrition, Bloc Opératoire) depuis le nœud donné,
+     * classés par durée totale croissante. Applique un code couleur distinct par type de centre.
+     *
+     * @param n Le nœud source à partir duquel chercher les plus proches voisins.
+     */
+    public void centre_proche(Node n) {
         ArrayList<ArrayList<Object[]>> resultatTri = grapheActuel.tri_centre_duree(n);
 
         // Initialisation des sous-listes
@@ -172,7 +193,14 @@ public class PopupInfosCentres {
         
     }
     
-    private void table_centre_km(Node n) {
+    /**
+     * Génère et affiche une fenêtre contenant un tableau des distances réelles (en kilomètres) 
+     * entre le nœud sélectionné et l'intégralité des autres centres triés par catégorie.
+     * La hauteur maximale de la fenêtre s'adapte dynamiquement mais reste bridée à 23 lignes.
+     *
+     * @param n Le nœud source utilisé pour calculer les distances.
+     */
+    public void table_centre_km(Node n) {
         
          //Initialisation de la liste de liste (fonction tri_centre)
          ArrayList<ArrayList<Object[]>> resultatTri;
@@ -227,7 +255,14 @@ public class PopupInfosCentres {
         
     }
 
-    private void table_centre_duree(Node n) {
+    /**
+     * Génère et affiche une fenêtre contenant un tableau des durées de trajet (en minutes)
+     * calculées entre le nœud sélectionné et l'ensemble des autres centres regroupés par catégorie.
+     * La taille de l'interface s'ajuste pour un confort de lecture optimal limité à 23 lignes.
+     *
+     * @param n Le nœud source servant de point de départ aux calculs temporels.
+     */
+    public void table_centre_duree(Node n) {
          //Initialisation de la liste de liste (fonction tri_centre)
          ArrayList<ArrayList<Object[]>> resultatTri;
          resultatTri = grapheActuel.tri_centre_duree(n);
@@ -280,7 +315,15 @@ public class PopupInfosCentres {
         fenetreTableau.setVisible(true);
     }
     
-    private void AfficheCouleursPlusieursLignes(JTable tableau) {
+    /**
+     * Applique un gestionnaire de rendu personnalisé (`TableCellRenderer`) sur le tableau fourni
+     * afin de colorer différemment les en-têtes de sections et les plages de lignes
+     * selon le type de centre (Maternité, Nutrition, Bloc Opératoire). S'appuie sur le 
+     * décompte total des types fourni par `fenetreActuelle.nbCentresParType()`.
+     *
+     * @param tableau Le `JTable` dont les cellules doivent être colorées dynamiquement.
+     */
+    public void AfficheCouleursPlusieursLignes(JTable tableau) {
         tableau.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
