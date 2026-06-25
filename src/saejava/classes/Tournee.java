@@ -323,7 +323,6 @@ public class Tournee {
             System.out.println("Centres livrés :");
 
             for (Node n : lstVehicules.get(vehiculeChosi).centresLivres) {
-                // System.out.println("- " + n.getId() + " (" + n.getAttribute("type") + ")");
                 System.out.print(n.getId()+";");
             }
 

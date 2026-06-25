@@ -72,7 +72,6 @@ public class Chemin {
      *
      * @author Balsan Agathe
      */
-
     public double getDureeEstimee() {
         return dureeEstimee;
     }
@@ -97,12 +96,6 @@ public class Chemin {
         return resultat;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Chemin [distanceTotale=" + distanceTotale + ", dureeTotale=" + dureeTotale + ", dureeEstimee="
-//                + dureeEstimee + "]";
-//    }
-    
     /**
      * Calcule le chemin de durée minimale entre deux centres à l'aide de l'algorithme de Dijkstra.
      *
@@ -257,7 +250,6 @@ public class Chemin {
         return traitementFini;
     }
 
-    //FAIRE ATTENTION AVEC LES EXCEPTIONS IL FAUT PAS QUE LA LISTE DE SOMMETS SOIT VIDE
     private Node centreAValeurMin(HashMap<Node, InfosCentresDijkstra> infosTableauDijkstra) {
         double valMin = Double.POSITIVE_INFINITY;
         Node centreMin = null;

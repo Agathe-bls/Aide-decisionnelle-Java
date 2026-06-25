@@ -70,7 +70,7 @@ public class MonGraphe extends SingleGraph {
         } else if (centre.getAttribute("type").equals("N")) {
             res = "Nutrition";
         } else {
-            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT À CA
+            throw new IllegalArgumentException("Type invalide : " + centre.getAttribute("type")); 
         }
         return res;
     }
@@ -368,9 +368,6 @@ public class MonGraphe extends SingleGraph {
         ArrayList<ArrayList<Object[]>> listeResultat = new ArrayList<>();
         listeResultat.add(listeMat);  
         listeResultat.add(listeNutri); 
-        listeResultat.add(listeBo);    
-        listeResultat.add(listeMat);
-        listeResultat.add(listeNutri);
         listeResultat.add(listeBo);
 
         return listeResultat;

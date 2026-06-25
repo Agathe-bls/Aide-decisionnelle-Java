@@ -69,7 +69,6 @@ public class MonGrapheTest {
         } catch (IllegalArgumentException e) {
             //L'exception attendue est bien levée
         }
-        //A FINIR QUAND ON AURA TOUTES LES EXCEPTIONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     @Test
@@ -113,7 +112,6 @@ public class MonGrapheTest {
                     }
                 }
             }
-
             assertEquals(graphe.getNodeCount(), centresVisites.size());
         }
     }

@@ -24,21 +24,18 @@ public class PopupInfosCentresTest {
 
     @Before
     public void setUp() {
-        // 1. Initialisation d'un vrai graphe GraphStream
+        
         grapheTest = new MonGraphe("GrapheTest");
         
-        // 2. Création du nœud source (le point de départ)
         noeudSource = grapheTest.addNode("S1");
         noeudSource.setAttribute("type", "M"); // Maternité
 
-        // 3. Création d'une structure minimale pour MaFenetre
         try {
             StubFenetre = new MaFenetre(); 
         } catch (Exception e) {
             StubFenetre = null; 
         }
 
-        // 4. ALLOCATION DIRECTE SANS CONSTRUCTEUR (Évite le JOptionPane bloquant)
         try {
             Constructor<Object> objectConstructor = Object.class.getConstructor();
             @SuppressWarnings("unchecked")
@@ -58,7 +55,6 @@ public class PopupInfosCentresTest {
             }
         }
 
-        // 5. INJECTION DES VARIABLES INTERNES FORCÉE
         injecterChampForce(popupCentres, "grapheActuel", grapheTest);
         injecterChampForce(popupCentres, "graphe", grapheTest);
         injecterChampForce(popupCentres, "monGraphe", grapheTest);
@@ -147,7 +143,7 @@ public class PopupInfosCentresTest {
 
     @Test
     public void testTableCentreDuree_HauteurFenetreBornee() {
-        // Génération de 26 nœuds
+        // Génération de 26 noeuds
         for (int i = 2; i <= 27; i++) {
             Node m = grapheTest.addNode("S" + i);
             m.setAttribute("type", "M");
