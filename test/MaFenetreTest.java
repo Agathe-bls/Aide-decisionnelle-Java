@@ -10,10 +10,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-<<<<<<< HEAD
-
-=======
->>>>>>> f7cf99dc351c3d91201fd31a6cfddd2b5dcd4d42
 import saejava.classes.MonGraphe;
 
 /**
