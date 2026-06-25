@@ -4,7 +4,6 @@
  */
 package Fenetre;
 
-import saejava.ExportCsv;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -270,7 +269,6 @@ public class MaFenetre extends JFrame {
         pMap.add((Component) this.view, BorderLayout.CENTER);
         
         pPrincipal.add(pMap,BorderLayout.CENTER);
-        
 
 
        //PARTIE EST 
@@ -441,9 +439,14 @@ public class MaFenetre extends JFrame {
                 if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     String fichier = f.getSelectedFile().getAbsolutePath();
 
-                    grapheActuel.clear();
-                    grapheActuel.chargerGraphe(fichier);
-                    nom_m.setText("District du fichier " + f.getSelectedFile().getName());
+                    try {
+                        grapheActuel.clear();
+                        grapheActuel.chargerGraphe(fichier);
+                        nom_m.setText("District du fichier " + f.getSelectedFile().getName());
+                    } catch (IllegalArgumentException ex) {
+                        System.out.println("Erreur : " + ex.getMessage());
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur import CSV", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(this, "Aucun fichier sélectionné.", "Import annulé", JOptionPane.INFORMATION_MESSAGE );
                 }
@@ -452,8 +455,23 @@ public class MaFenetre extends JFrame {
             case 1:
                 String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
                 try {
+                int nbCentres = Integer.parseInt(reponse);
+
+                if (nbCentres > 500) {
+                    System.out.println("Erreur : le nombre de centres ne peut pas dépasser 500.");
+
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Le nombre de centres ne peut pas dépasser 500.",
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+
+                    break;
+                }
+
                 grapheActuel.clear();
-                grapheActuel.creerGrapheAlea(Integer.parseInt(reponse));
+                grapheActuel.creerGrapheAlea(nbCentres);
                 nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
                 } catch (java.lang.NumberFormatException ex) {
                     if (!"".equals(reponse)) {
@@ -703,7 +721,7 @@ public class MaFenetre extends JFrame {
             }
             
             route.addAttribute("ui.label", label);
-            route.addAttribute("ui.style", "text-size: 15; text-background-mode: rounded-box; text-background-color : white; ");  //text-alignment: along; ne fonctionne pas
+            route.addAttribute("ui.style", "text-size: 15; text-color: black; text-alignment: along; text-background-mode: rounded-box; text-background-color : white;");  //text-alignment: along; ne fonctionne pas et ca nn plus text-background-mode: rounded-box; text-background-color : white;
             
             return label;
     }
@@ -733,8 +751,8 @@ public class MaFenetre extends JFrame {
                     double fiaRoute = (route.getAttribute("fiabilite"));
                     double seuil = (double) seuil_cpt.getValue();
                     if (fiaRoute < seuil) {
-                        route.setAttribute("ui.label", " ⚠ ");
-                        route.setAttribute("ui.style", "text-size: 25; text-background-mode: plain; text-background-color : white; text-style: normal; ");
+                        route.setAttribute("ui.label", "⚠");
+                        route.setAttribute("ui.style", "text-size: 25; text-color: RED;");
                     }
                     else {
                         labelCheckRoute(route);

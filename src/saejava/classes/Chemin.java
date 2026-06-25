@@ -285,7 +285,7 @@ public class Chemin {
             }
         } else if (typeChemin.equals("dureeEstimee")) {
             for (Edge e : routesTraversees) {
-                e.setAttribute("ui.style", "fill-color: #07b817; size: 3px; shape : cubic-curve; arrow-shape : arrow;");
+                e.setAttribute("ui.style", "fill-color: #07b817; size: 3px;");
             }
         }
     }

@@ -272,7 +272,7 @@ public class MonGraphe extends SingleGraph {
      */
     public void visualisationGraphe() {
         for (Node n : this.getNodeSet()) {
-            n.setAttribute("ui.style", "size : 20;");
+            n.setAttribute("ui.style", "size : 25;");
             if (n.getAttribute("type").equals("M")) {
                 n.addAttribute("ui.label", n.getId());
                 n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
