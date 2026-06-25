@@ -22,7 +22,7 @@ import saejava.classes.MonGraphe;
  * présentant des informations analytiques sur un centre (nœud) sélectionné du graphe.
  * Permet d'obtenir les centres les plus proches ou des tableaux de distances et de durées.
  *
- * @author Agathe
+ * @author Auryann
  */
 public class PopupInfosCentres {
     /** La fenêtre principale de l'application. */
