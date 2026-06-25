@@ -269,7 +269,6 @@ public class MaFenetre extends JFrame {
         pMap.add((Component) this.view, BorderLayout.CENTER);
         
         pPrincipal.add(pMap,BorderLayout.CENTER);
-        
 
 
        //PARTIE EST 
@@ -722,7 +721,7 @@ public class MaFenetre extends JFrame {
             }
             
             route.addAttribute("ui.label", label);
-            route.addAttribute("ui.style", "text-size: 15; ");  //text-alignment: along; ne fonctionne pas et ca nn plus text-background-mode: rounded-box; text-background-color : white;
+            route.addAttribute("ui.style", "text-size: 15; text-color: black; text-alignment: along; text-background-mode: rounded-box; text-background-color : white;");  //text-alignment: along; ne fonctionne pas et ca nn plus text-background-mode: rounded-box; text-background-color : white;
             
             return label;
     }
@@ -752,8 +751,8 @@ public class MaFenetre extends JFrame {
                     double fiaRoute = (route.getAttribute("fiabilite"));
                     double seuil = (double) seuil_cpt.getValue();
                     if (fiaRoute < seuil) {
-                        route.setAttribute("ui.label", " ⚠ ");
-                        route.setAttribute("ui.style", "text-size: 25; text-background-mode: plain; text-background-color : white; text-style: normal; ");
+                        route.setAttribute("ui.label", "⚠");
+                        route.setAttribute("ui.style", "text-size: 25; text-color: RED;");
                     }
                     else {
                         labelCheckRoute(route);
