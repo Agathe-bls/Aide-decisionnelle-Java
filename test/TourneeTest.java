@@ -171,7 +171,6 @@ public class TourneeTest {
                 auMoinsUneAreteColoriee = true;
             }
         }
-
         assertTrue(auMoinsUneAreteColoriee);
     }
 }
