@@ -92,8 +92,8 @@ public class MaFenetre extends JFrame {
     
 //PARTIE EST 
     private JLabel titreComboC;
-    private DefaultListModel<String> listModelCentres; // <-- À AJOUTER
-    private JList<String> listeVisuelleCentres;        // <-- À AJOUTER
+    private DefaultListModel<String> listModelCentres; 
+    private JList<String> listeVisuelleCentres;
     
 //MENU
     private JMenuBar menuBar;
@@ -418,9 +418,6 @@ public class MaFenetre extends JFrame {
         });
     }
     
-    /**
-     * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
-     */
     private void popup_nouv_district() throws IOException{
         String[] options = {"Import", "Création aléatoire", "Annuler"};
         int choix = JOptionPane.showOptionDialog(this, "Comment voulez vous créer votre nouveau district ?", "Choix du district", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -484,10 +481,6 @@ public class MaFenetre extends JFrame {
         recharger_infos();
     }
     
-    /**
-     * @exception NombreVehiculeInvalideException
-     * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
-     */
     private void popup_nouv_t() throws NombreVehiculeInvalideException {
         intervention.setText("0 véhicules en tournée");
         coutEtTrajet.setText("");
@@ -539,7 +532,7 @@ public class MaFenetre extends JFrame {
                 
                 if (choixNbV == null || choixNbV.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Aucun nombre de véhicules renseigné.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    break; //OULA POURQUOI IL Y A UN BREAK ICI
+                    break;
                 }
 
                 int NbV;
