@@ -369,11 +369,9 @@ public class MaFenetre extends JFrame {
                     float ordonnee = (float) (e.getY() * tx.getScaleY());
 
                     GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
-                    System.out.println(element);
                     if (element != null) {
                         Node n = grapheActuel.getNode(element.getId());
                         if (n != null) {
-                            //popup_infos_centre(n);
                             popupInfoC = new PopupInfosCentres(MaFenetre.this, grapheActuel, n);
                         }
                     }
