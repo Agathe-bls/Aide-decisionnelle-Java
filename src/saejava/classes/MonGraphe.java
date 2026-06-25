@@ -272,18 +272,18 @@ public class MonGraphe extends SingleGraph {
      */
     public void visualisationGraphe() {
         for (Node n : this.getNodeSet()) {
-            n.setAttribute("ui.style", "size : 25;");
+            n.setAttribute("ui.style", "size : 25; text-alignment : center;");
             if (n.getAttribute("type").equals("M")) {
                 n.addAttribute("ui.label", n.getId());
-                n.addAttribute("ui.style", "text-size: 20px; fill-color: #FA8FF1;");
+                n.addAttribute("ui.style", "text-size: 15px; fill-color: #FA8FF1;");
             } else if (n.getAttribute("type").equals("O")) {
                 n.addAttribute("ui.label", n.getId());
-                n.addAttribute("ui.style", "text-size: 20px; fill-color: #8FB6FA;");
+                n.addAttribute("ui.style", "text-size: 15px; fill-color: #8FB6FA;");
             } else if (n.getAttribute("type").equals("N")) {
                 n.addAttribute("ui.label", n.getId());
-                n.addAttribute("ui.style", "text-size: 20px; fill-color: #93FA8F;");
+                n.addAttribute("ui.style", "text-size: 15px; fill-color: #93FA8F;");
             } else {
-                throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+                throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type"));
             }
         }
     }

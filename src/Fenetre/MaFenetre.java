@@ -323,14 +323,9 @@ public class MaFenetre extends JFrame {
         scrollPaneV2.getViewport().setBackground(Color.WHITE);
         
 
-        pPrincipal.add(pBas, BorderLayout.SOUTH);        
-
-
-        
-
+        pPrincipal.add(pBas, BorderLayout.SOUTH);   
         
         this.pack();
-
         this.setContentPane(pPrincipal);
     }
     
@@ -343,7 +338,6 @@ public class MaFenetre extends JFrame {
                 System.getLogger(MaFenetre.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
             }
         });
-
         
         //CLic sur un centre de la liste 
         listeVisuelleCentres.addMouseListener(new MouseAdapter() {
@@ -495,6 +489,7 @@ public class MaFenetre extends JFrame {
      * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
      */
     private void popup_nouv_t() throws NombreVehiculeInvalideException {
+        intervention.setText("0 véhicules en tournée");
         coutEtTrajet.setText("");
         coutEtTrajetV2.setText("");
         chemin.clearVisualisations();
@@ -502,7 +497,7 @@ public class MaFenetre extends JFrame {
         int choix = JOptionPane.showOptionDialog(this, "Quel type de trajet voulez-vous ?", "Choix du trajet", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
         
         switch (choix) {
-            case 0:
+            case 0 :
                 String choixDepart  = JOptionPane.showInputDialog( null, "De quel centre voulez vous partir", "Choix du départ du chemin", JOptionPane.QUESTION_MESSAGE) ;
                 String choixArrivee  = JOptionPane.showInputDialog( null, "A quel centre voulez vous arriver", "Choix de l'arrivée du chemin", JOptionPane.QUESTION_MESSAGE) ;
                 
@@ -539,12 +534,12 @@ public class MaFenetre extends JFrame {
                 }
                 break;
 
-            case 1:
+            case 1 :
                 String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
                 
                 if (choixNbV == null || choixNbV.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Aucun nombre de véhicules renseigné.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    break;
+                    break; //OULA POURQUOI IL Y A UN BREAK ICI
                 }
 
                 int NbV;
@@ -555,7 +550,7 @@ public class MaFenetre extends JFrame {
                     JOptionPane.showMessageDialog(this, "Le nombre de véhicules doit être un nombre entier.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     break;
                 }
-
+                intervention.setText(NbV + " véhicules en tournée");
                 switch (NbV) {
                     case 1:
                         String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
@@ -721,7 +716,7 @@ public class MaFenetre extends JFrame {
             }
             
             route.addAttribute("ui.label", label);
-            route.addAttribute("ui.style", "text-size: 15; text-color: black; text-alignment: along; text-background-mode: rounded-box; text-background-color : white;");  //text-alignment: along; ne fonctionne pas et ca nn plus text-background-mode: rounded-box; text-background-color : white;
+            route.addAttribute("ui.style", "text-size: 15; text-color: black; text-alignment: along; text-background-mode: rounded-box; text-background-color : white;");
             
             return label;
     }
