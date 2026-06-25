@@ -1,0 +1,812 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package Fenetre;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GraphicsConfiguration;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JSpinner;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
+import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.swingViewer.DefaultView;
+import org.graphstream.ui.view.Viewer;
+
+import Exceptions.NombreVehiculeInvalideException;
+import saejava.classes.MonGraphe;
+import saejava.classes.Chemin;
+import saejava.classes.Tournee;
+import saejava.ExportCsv;
+
+public class MaFenetre extends JFrame {
+
+//PARTIE MAP
+    private DefaultView view;
+    private final MonGraphe grapheActuel = new MonGraphe("gActuel"); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    private JPanel pMap;
+    
+//PARTIE HAUT
+    //Nouvelle-map
+    private JLabel nom_m;
+    private JButton btNouvelle_map;
+    public static JFileChooser f;
+    
+    //Vehicules
+    private JLabel vehicule;
+    private JLabel intervention;
+    
+    //Centres
+    private JLabel type_centre;
+    private JLabel nutrition;
+    private JLabel nbr_n;
+    private JPanel couleur_n;
+    private JLabel maternite;
+    private JLabel nbr_m;
+    private JPanel couleur_m;
+    private JLabel bloc_operatoire;
+    private JLabel nbr_bo;
+    private JPanel couleur_bo;
+    
+    //Nouveau trajets
+    private JButton btNouveau_trajet;
+    private final Chemin chemin = new Chemin(grapheActuel); //final car même si on fait des actions dessus pour le modifier il ne "change" jamais
+    
+//PARTIE BAS
+    private JLabel coutEtTrajet;
+    private JLabel coutEtTrajetV2;
+    private JScrollPane scrollPane;
+    private JScrollPane scrollPaneV2;
+    
+    private Tournee tournee1V;
+    private Tournee tournee2V;
+    
+//PARTIE EST 
+    private JLabel titreComboC;
+    private DefaultListModel<String> listModelCentres; // <-- À AJOUTER
+    private JList<String> listeVisuelleCentres;        // <-- À AJOUTER
+    
+//MENU
+    private JMenuBar menuBar;
+    private JMenu menuCentres;
+    private JMenu menuRoutes;
+    private JMenu menuSeuil;
+    private JCheckBoxMenuItem checkType;
+    private JCheckBoxMenuItem checkNom;
+    private JCheckBoxMenuItem checkFia;
+    private JCheckBoxMenuItem checkDuree;
+    private JCheckBoxMenuItem checkDistance;
+    private JSpinner seuil_cpt;
+    
+//Infos au clic
+    private PopupInfosCentres popupInfoC;
+
+    /**
+     * Construit la fênetre principalede l'application.
+     * Initialise l'interface graphique, son menu, ses composants, ses écouteurs, ses paramètres d'affichage ainsi que la visualisation initiale du graphe.
+     * La fenêtre est ensuite étendue sur tout l'écrant et rendue visible.
+     *
+     * @author Balsan Agathe
+     */
+    public MaFenetre(){
+        super("MedicOne");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.pack();
+        this.setLocationRelativeTo(null);
+        
+        créationMenu();
+        initComposants();
+        initEcouteurs();
+        siGraphPresent();
+        visuSeuil();
+        gererTailleTextes();
+        
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setVisible(true);
+    }
+    
+    public MonGraphe getGrapheActuel() {
+        return grapheActuel;
+    }
+    
+    private void créationMenu(){
+        menuBar = new JMenuBar();
+        MaFenetre.this.setJMenuBar(menuBar);
+        
+        menuCentres = new JMenu("Informations des centres");
+        menuRoutes = new JMenu("Informations des routes");
+        menuSeuil = new JMenu("Seuil de dangerosité");
+        
+        checkNom = new JCheckBoxMenuItem("Noms des centres");
+        checkNom.setSelected(true);
+        checkType = new JCheckBoxMenuItem("Types des centres");
+        checkFia = new JCheckBoxMenuItem("Fiabilités");
+        checkDuree = new JCheckBoxMenuItem("Durées");
+        checkDistance = new JCheckBoxMenuItem("Distances");
+        seuil_cpt = new JSpinner(new SpinnerNumberModel(0,0,1,0.1));
+        seuil_cpt.setPreferredSize(new Dimension(173,20));
+        
+        menuCentres.add(checkNom);
+        menuCentres.add(checkType);
+
+        menuRoutes.add(checkFia);
+        menuRoutes.add(checkDuree);
+        menuRoutes.add(checkDistance);
+        
+        menuSeuil.add(seuil_cpt);
+        
+        menuBar.add(menuCentres);
+        menuBar.add(menuRoutes);
+        menuBar.add(menuSeuil);
+    }
+    
+    private void initComposants(){ 
+        JPanel pPrincipal = new JPanel(new BorderLayout());
+        
+        //PARTIE HAUT 
+        //Nouvelle-map
+        JPanel pHaut = new JPanel(new GridBagLayout());
+        pHaut.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        pHaut.setPreferredSize(new Dimension(1800,120));
+        pHaut.setBackground(Color.lightGray);
+        GridBagConstraints gbcHaut = new GridBagConstraints();
+        gbcHaut.insets = new Insets(0, 100, 0, 100);
+        
+        nom_m = new JLabel("Chargez ou creez un district");
+        btNouvelle_map = new JButton("Nouveau district");
+        
+        gbcHaut.gridheight = 2;
+        gbcHaut.gridx = 0; gbcHaut.gridy = 0;
+        pHaut.add(nom_m, gbcHaut);
+                       gbcHaut.gridy = 2;
+        pHaut.add(btNouvelle_map, gbcHaut);
+        
+        //Vehicule
+        gbcHaut.insets = new Insets(0, 80, 0, 180);
+        vehicule = new JLabel("Véhicule");
+        intervention = new JLabel("0 véhicules en tournée", JLabel.CENTER);
+        gbcHaut.gridx = 1; gbcHaut.gridy = 0;
+        pHaut.add(vehicule, gbcHaut);
+                       gbcHaut.gridy = 2;
+        pHaut.add(intervention, gbcHaut);
+        gbcHaut.gridheight = 1;
+        
+        //Centres
+        gbcHaut.insets = new Insets(5, 20, 5, 20); // Pour ne pas avoir trop d'espaces entre les infos des centres
+        type_centre = new JLabel("Type De Centre", JLabel.CENTER);
+        nutrition = new JLabel("Nutrition");
+        nbr_n = new JLabel("0");
+        couleur_n = InfosCouleursCentres(0);
+        
+        maternite = new JLabel("Maternité");
+        nbr_m = new JLabel("0");
+        couleur_m = InfosCouleursCentres(1);
+        
+        bloc_operatoire= new JLabel("Bloc Opératoire");
+        nbr_bo = new JLabel("0");
+        couleur_bo = InfosCouleursCentres(2);
+        
+        gbcHaut.gridwidth = 3;
+        gbcHaut.gridx = 2; gbcHaut.gridy = 0;
+        pHaut.add(type_centre, gbcHaut);  
+        
+        gbcHaut.gridwidth = 1;
+        gbcHaut.anchor = GridBagConstraints.LINE_START;
+        gbcHaut.gridx = 2; gbcHaut.gridy = 1;
+        pHaut.add(couleur_n, gbcHaut);
+        gbcHaut.anchor = GridBagConstraints.CENTER;
+        gbcHaut.gridx = 3;
+        pHaut.add(nutrition, gbcHaut);
+        gbcHaut.gridx = 4; 
+        pHaut.add(nbr_n, gbcHaut);
+        
+        gbcHaut.anchor = GridBagConstraints.LINE_START;
+        gbcHaut.gridx = 2; gbcHaut.gridy = 2;
+        pHaut.add(couleur_m, gbcHaut);
+        gbcHaut.anchor = GridBagConstraints.CENTER;
+        gbcHaut.gridx = 3;
+        pHaut.add(maternite, gbcHaut);
+        gbcHaut.gridx = 4; 
+        pHaut.add(nbr_m, gbcHaut);
+        
+        gbcHaut.anchor = GridBagConstraints.LINE_START;
+        gbcHaut.gridx = 2; gbcHaut.gridy = 3;
+        pHaut.add(couleur_bo, gbcHaut);
+        gbcHaut.anchor = GridBagConstraints.CENTER;
+        gbcHaut.gridx = 3;
+        pHaut.add(bloc_operatoire, gbcHaut);
+        gbcHaut.gridx = 4; 
+        pHaut.add(nbr_bo, gbcHaut);
+        
+        //Nouveau trajet
+        gbcHaut.insets = new Insets(10, 100, 10, 100);
+        btNouveau_trajet = new JButton("Nouveau Trajet");
+         
+        gbcHaut.gridheight = 4;
+        gbcHaut.gridx = 5; gbcHaut.gridy = 0;
+        pHaut.add(btNouveau_trajet, gbcHaut);
+        
+        pPrincipal.add(pHaut, BorderLayout.NORTH);
+        
+        //MAP
+        pMap = new JPanel(new BorderLayout());
+        pMap.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        pMap.setPreferredSize(new Dimension(700,500));
+        grapheActuel.visualisationGraphe();
+        Viewer viewer = new Viewer(grapheActuel, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        viewer.enableAutoLayout();// affichage automatique
+        this.view=(DefaultView) viewer.addDefaultView(false);
+        
+        pMap.add((Component) this.view, BorderLayout.CENTER);
+        
+        pPrincipal.add(pMap,BorderLayout.CENTER);
+
+
+       //PARTIE EST 
+       JPanel pEst = new JPanel(new GridBagLayout());
+        pEst.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        GridBagConstraints gbcEst = new GridBagConstraints();
+        pEst.setPreferredSize(new Dimension(220,650));
+        pEst.setBackground(Color.lightGray);
+        
+        // Titre
+        titreComboC = new JLabel("Centres de santé");
+        gbcEst.insets = new Insets(15, 10, 10, 10);
+        gbcEst.gridx = 0; gbcEst.gridy = 0; 
+        gbcEst.weightx = 1.0;
+        gbcEst.fill = GridBagConstraints.HORIZONTAL;
+        titreComboC.setHorizontalAlignment(JLabel.CENTER);
+        pEst.add(titreComboC, gbcEst);
+        
+        // Initialisation de la JList
+        listModelCentres = new DefaultListModel<>();
+        listeVisuelleCentres = new JList<>(listModelCentres);
+        listeVisuelleCentres.setBackground(Color.LIGHT_GRAY);
+        listeVisuelleCentres.setFont(new Font("Arial", Font.PLAIN, 14));
+        
+        // ScrollPane pour la liste
+        JScrollPane scrollCentres = new JScrollPane(listeVisuelleCentres);
+        scrollCentres.setBorder(BorderFactory.createEmptyBorder());
+        
+        gbcEst.insets = new Insets(0, 10, 15, 10);
+        gbcEst.gridy = 1;
+        gbcEst.weighty = 1.0; 
+        gbcEst.fill = GridBagConstraints.BOTH;
+        pEst.add(scrollCentres, gbcEst);
+        
+        pPrincipal.add(pEst, BorderLayout.EAST);
+        
+
+        //PARTIE BAS
+        JPanel pBas = new JPanel(new BorderLayout());
+        
+        coutEtTrajet = new JLabel("", JLabel.CENTER);
+        coutEtTrajetV2 = new JLabel("", JLabel.CENTER);
+        
+        scrollPane = new JScrollPane(coutEtTrajet);
+        scrollPane.setPreferredSize(new Dimension(768, 50));
+        pBas.add(scrollPane, BorderLayout.WEST);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        
+        scrollPaneV2 = new JScrollPane(coutEtTrajetV2);
+        scrollPaneV2.setPreferredSize(new Dimension(768, 50));
+        pBas.add(scrollPaneV2, BorderLayout.EAST);
+        scrollPaneV2.getViewport().setBackground(Color.WHITE);
+        
+
+        pPrincipal.add(pBas, BorderLayout.SOUTH);   
+        
+        this.pack();
+        this.setContentPane(pPrincipal);
+    }
+    
+    private void initEcouteurs() {
+        //PARTIE HAUT
+        btNouvelle_map.addActionListener((ActionEvent e) -> {
+            try {
+                popup_nouv_district();
+            } catch (IOException ex) {
+                System.getLogger(MaFenetre.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            }
+        });
+        
+        //CLic sur un centre de la liste 
+        listeVisuelleCentres.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) { 
+                    String selection = listeVisuelleCentres.getSelectedValue();
+                    if (selection != null && selection.contains(":")) {
+                        String idCentre = selection.split(":")[0];
+                        idCentre = idCentre.trim().toUpperCase();
+                        Node n = grapheActuel.getNode(idCentre);
+                        if (n != null) {
+                            popupInfoC = new PopupInfosCentres(MaFenetre.this, grapheActuel, n);
+                        } 
+                    }
+                }
+            }
+        });
+        
+        //Clic-Droit sur les centres
+        view.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (javax.swing.SwingUtilities.isRightMouseButton(e)) {
+                    GraphicsConfiguration gc = view.getGraphicsConfiguration();
+                    AffineTransform tx = gc.getDefaultTransform();
+
+                    float abscisse = (float) (e.getX() * tx.getScaleX());
+                    float ordonnee = (float) (e.getY() * tx.getScaleY());
+
+                    GraphicElement element = view.findNodeOrSpriteAt(abscisse, ordonnee);
+                    System.out.println(element);
+                    if (element != null) {
+                        Node n = grapheActuel.getNode(element.getId());
+                        if (n != null) {
+                            //popup_infos_centre(n);
+                            popupInfoC = new PopupInfosCentres(MaFenetre.this, grapheActuel, n);
+                        }
+                    }
+                }
+            }
+        });
+   
+        
+        //Nouveau trajet 
+        btNouveau_trajet.addActionListener(e -> {
+            try {
+                popup_nouv_t();
+            } catch (NombreVehiculeInvalideException ex) {
+                System.out.println(ex.getMessage());
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        //MENU
+        checkFia.addActionListener((ActionEvent e) -> {
+            for (Edge route : grapheActuel.getEachEdge()) {
+                labelCheckRoute(route);
+            }
+        });
+        checkDuree.addActionListener((ActionEvent e) -> {
+            for (Edge route : grapheActuel.getEachEdge()) {
+                labelCheckRoute(route);
+            }
+        });
+        checkDistance.addActionListener((ActionEvent e) -> {
+            for (Edge route : grapheActuel.getEachEdge()) {
+                labelCheckRoute(route);
+            }
+        });
+
+        checkNom.addActionListener((ActionEvent e) -> {
+            labelCheckCentres();
+        });
+        
+        checkType.addActionListener((ActionEvent e) -> {
+            labelCheckCentres();
+        });
+    }
+    
+    /**
+     * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
+     */
+    private void popup_nouv_district() throws IOException{
+        String[] options = {"Import", "Création aléatoire", "Annuler"};
+        int choix = JOptionPane.showOptionDialog(this, "Comment voulez vous créer votre nouveau district ?", "Choix du district", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        switch (choix) {
+            case 0:
+                f = new JFileChooser();
+                FileNameExtensionFilter filtre = new FileNameExtensionFilter("Fichier exel", "csv");
+                f.setFileFilter(filtre);
+                
+                if (f.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    String fichier = f.getSelectedFile().getAbsolutePath();
+
+                    try {
+                        grapheActuel.clear();
+                        grapheActuel.chargerGraphe(fichier);
+                        nom_m.setText("District du fichier " + f.getSelectedFile().getName());
+                    } catch (IllegalArgumentException ex) {
+                        System.out.println("Erreur : " + ex.getMessage());
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur import CSV", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Aucun fichier sélectionné.", "Import annulé", JOptionPane.INFORMATION_MESSAGE );
+                }
+                break;
+
+            case 1:
+                String reponse = JOptionPane.showInputDialog(this, "Combien de centres voulez vous dans votre district ?", "Choix nombre de centres", JOptionPane.QUESTION_MESSAGE);
+                try {
+                int nbCentres = Integer.parseInt(reponse);
+
+                if (nbCentres > 500) {
+                    System.out.println("Erreur : le nombre de centres ne peut pas dépasser 500.");
+
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Le nombre de centres ne peut pas dépasser 500.",
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+
+                    break;
+                }
+
+                grapheActuel.clear();
+                grapheActuel.creerGrapheAlea(nbCentres);
+                nom_m.setText("District aléatoire avec " + grapheActuel.getNodeCount() + " centres");
+                } catch (java.lang.NumberFormatException ex) {
+                    if (!"".equals(reponse)) {
+                        System.out.println("Valeur incorrect : "+ reponse);
+                        JOptionPane.showMessageDialog(this, "Valeur incorrect : "+reponse, "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        System.out.println("Pas de valeur rentrée");
+                        JOptionPane.showMessageDialog(this, "Pas de valeur rentrée", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        recharger_infos();
+    }
+    
+    /**
+     * @exception NombreVehiculeInvalideException
+     * @author Mattis (j'ai rajouter les pop up d'erreur) mais pas que ...... pour le reste
+     */
+    private void popup_nouv_t() throws NombreVehiculeInvalideException {
+        intervention.setText("0 véhicules en tournée");
+        coutEtTrajet.setText("");
+        coutEtTrajetV2.setText("");
+        chemin.clearVisualisations();
+        String[] options = {"Itinéraire entre centres", "Tournée Véhicule", "Annuler"};
+        int choix = JOptionPane.showOptionDialog(this, "Quel type de trajet voulez-vous ?", "Choix du trajet", 0, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+        
+        switch (choix) {
+            case 0 :
+                String choixDepart  = JOptionPane.showInputDialog( null, "De quel centre voulez vous partir", "Choix du départ du chemin", JOptionPane.QUESTION_MESSAGE) ;
+                String choixArrivee  = JOptionPane.showInputDialog( null, "A quel centre voulez vous arriver", "Choix de l'arrivée du chemin", JOptionPane.QUESTION_MESSAGE) ;
+                
+                if (choixDepart == null || choixArrivee == null || choixDepart.isEmpty() || choixArrivee.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Le centre de départ ou le centre d'arrivée n'a pas été renseigné.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+                
+                Node depart = grapheActuel.getNode(choixDepart.toUpperCase());
+                Node arrivee = grapheActuel.getNode(choixArrivee.toUpperCase());
+
+                if (depart == null || arrivee == null) {
+                    JOptionPane.showMessageDialog(this, "Le centre de départ ou le centre d'arrivée n'existe pas.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+                
+                String[] optionsCh = {"Chemin le plus rapide", "Chemin rapide et fiable", "Annuler"};
+                int choixCh = JOptionPane.showOptionDialog(this, "Quel type de chemin voulez-vous ?", "Choix du chemin", 0, JOptionPane.QUESTION_MESSAGE, null, optionsCh, optionsCh[2]);
+                switch (choixCh) {
+                    case 0:
+                        chemin.cheminDureeMinDijkstra(depart, arrivee);
+                        chemin.visualisationChemin("dureeMin");
+                        coutEtTrajet.setForeground(Color.RED);
+                        coutEtTrajet.setText("Durée : " + chemin.getDureeTotale() + " min. " + chemin.getCentresTraverses());
+                        break;
+                    case 1:
+                        chemin.cheminDureeEstimeeDijkstra(depart, arrivee);
+                        chemin.visualisationChemin("dureeEstimee");
+                        coutEtTrajet.setForeground(Color.decode("#07b817"));
+                        coutEtTrajet.setText("Durée estimée avec fiabilitée : " + chemin.getDureeEstimee() + " min. " + chemin.getCentresTraverses());
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case 1 :
+                String choixNbV  = JOptionPane.showInputDialog( null, "Combien de véhicules voulez vous utiliser ?", "Choix du nombre de véhicules", JOptionPane.QUESTION_MESSAGE) ;
+                
+                if (choixNbV == null || choixNbV.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Aucun nombre de véhicules renseigné.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break; //OULA POURQUOI IL Y A UN BREAK ICI
+                }
+
+                int NbV;
+
+                try {
+                    NbV = Integer.parseInt(choixNbV);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Le nombre de véhicules doit être un nombre entier.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+                intervention.setText(NbV + " véhicules en tournée");
+                switch (NbV) {
+                    case 1:
+                        String choixTypeCentres[] = {"Nutrition", "Maternité", "Bloc opératoire", "Tous"};
+                        int TypeCentres  = JOptionPane.showOptionDialog(this, "Quel type de centre voulez vous dans votre tournée?", "Choix du type des centres de la tournée", 0, JOptionPane.QUESTION_MESSAGE, null, choixTypeCentres, choixTypeCentres[3]) ;
+                        
+                        String type;
+                        switch(TypeCentres){
+                            case 0 : type = "N"; coutEtTrajet.setForeground(Color.decode("#6ac666")); break;
+                            case 1 : type = "M"; coutEtTrajet.setForeground(Color.decode("#ee0bdc")); break;
+                            case 2 : type = "O"; coutEtTrajet.setForeground(Color.decode("#5f97f7")); break;
+                            default : type = null; coutEtTrajet.setForeground(Color.black); break;
+                        }
+                        tournee1V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 1);
+                        tournee1V.calculerTourneeUnVehicule(type); //null / O / N / M
+                        tournee1V.colorierTourneeUnVehicule(0);
+                        coutEtTrajet.setText("Durée de la tournée : " + tournee1V.getDureeTotale(0) + " min. " + tournee1V.getLabelCentresLivres(0));
+                        tournee1V.afficherTournee(0);
+                        ExportCsv.exporterTournes(tournee1V);
+                        
+                        break;
+                    case 2:
+                        tournee2V = new Tournee(grapheActuel, grapheActuel.getNode("S1"), 2);
+                        tournee2V.calculerTourneeDeuxVehicules();
+                        
+                        tournee2V.colorierTourneeUnVehicule(0);
+                        tournee2V.colorierTourneeUnVehicule(1);
+                        
+                        coutEtTrajet.setForeground(Color.black);
+                        coutEtTrajet.setText("Durée de la tournée de V1 : " + tournee2V.getDureeTotale(0) + " min. " + tournee2V.getLabelCentresLivres(0));
+                        coutEtTrajetV2.setForeground(Color.decode("#b4083e"));
+                        coutEtTrajetV2.setText(" Durée de la tournée de V2 : " + tournee2V.getDureeTotale(1) + " min. " + tournee2V.getLabelCentresLivres(1));
+                        
+                        tournee2V.afficherTournee(0);
+                        tournee2V.afficherTournee(1);
+                        
+                        ExportCsv.exporterTournes(tournee2V);
+                        break;
+                    default:
+                        throw new NombreVehiculeInvalideException();
+                } break;
+
+            case 2:break;
+                
+            default:
+                break;
+        }
+    }
+    
+    private void mettreAJourListeEst() {
+        if (listModelCentres == null) return;
+        
+        listModelCentres.clear(); // On vide l'ancienne liste
+        
+        if (grapheActuel != null && !grapheActuel.getEstVide()) {
+            for (Node n : grapheActuel.getEachNode()) {
+                String id = n.getId();
+                String typeCode = n.getAttribute("type");
+                String typeComplet = "";
+                
+                // Traduction des codes de vos attributs graphstream en texte lisible
+                if ("N".equals(typeCode)) typeComplet = "Nutrition";
+                else if ("M".equals(typeCode)) typeComplet = "Maternité";
+                else if ("O".equals(typeCode)) typeComplet = "Bloc Opératoire";
+                else typeComplet = "Inconnu";
+                
+                listModelCentres.addElement(" " + id + " : " + typeComplet);
+            }
+        }
+    }
+    
+    private void recharger_infos(){
+        siGraphPresent();
+        coutEtTrajet.setText("");
+        coutEtTrajetV2.setText("");
+        grapheActuel.visualisationGraphe();
+        labelCentresParType();
+
+        mettreAJourListeEst();
+        
+        seuil_cpt.setValue(0.1);
+    }
+    
+    /**
+     * Compte le nombre de centres de chaque type présents dans le graphe actuel.
+     *
+     * @return un tableau d'entiers contenant respectivement le nombre de centres de type
+     * Nutrition (indice 0), Maternité (indice 1) et Bloc opératoire (indice 2)
+     *
+     * @author Balsan Agathe
+     */
+    public int[] nbCentresParType() {
+        int[] tabNbParTypes = new int[3];
+        int nu = 0, m = 0, o = 0;
+        for(Node n : grapheActuel.getEachNode()){
+            if(n.getAttribute("type").equals("N"))
+                nu ++;
+            else if(n.getAttribute("type").equals("M"))
+                m++;
+            else if(n.getAttribute("type").equals("O"))
+                o++;
+            else
+                throw new IllegalArgumentException("Type invalide : " + n.getAttribute("type")); //REVERIFIER OU VONT TOUTES LES EXCEPTIONS PAR RAPPORT A CA
+        }
+        
+        tabNbParTypes[0] = nu;
+        tabNbParTypes[1] = m;
+        tabNbParTypes[2] = o;
+        return tabNbParTypes;
+    }
+    
+    private void labelCentresParType(){
+        nbr_bo.setText("" + nbCentresParType()[2]);
+        nbr_m.setText("" + nbCentresParType()[1]);
+        nbr_n.setText("" +  nbCentresParType()[0]); 
+    }
+    
+    private void siGraphPresent() {
+        if (grapheActuel.getEstVide() == true) {
+            btNouveau_trajet.setEnabled(false);
+            checkFia.setEnabled(false);
+            checkDuree.setEnabled(false);
+            checkDistance.setEnabled(false);
+            checkNom.setEnabled(false);
+            checkType.setEnabled(false);
+            seuil_cpt.setEnabled(false);
+        } else {
+            btNouveau_trajet.setEnabled(true);
+            checkFia.setEnabled(true);
+            checkDuree.setEnabled(true);
+            checkDistance.setEnabled(true);
+            checkNom.setEnabled(true);
+            checkType.setEnabled(true);
+            seuil_cpt.setEnabled(true);
+            
+            checkFia.setSelected(false);
+            checkDuree.setSelected(false);
+            checkDistance.setSelected(false);
+            checkNom.setSelected(true);
+            checkType.setSelected(false);
+            seuil_cpt.setValue(0.1);
+        }
+    }
+    
+    private String labelCheckRoute(Edge route){
+            String label = "";
+
+            if (checkFia.isSelected()) {
+                label += route.getAttribute("fiabilite") + " fia";
+            }
+
+            if (checkDuree.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("duree") + " min";
+            }
+
+            if (checkDistance.isSelected()) {
+                if (!label.equals("")) {
+                    label += " | ";
+                }
+                label += route.getAttribute("distance") + " km";
+            }
+            
+            route.addAttribute("ui.label", label);
+            route.addAttribute("ui.style", "text-size: 15; text-color: black; text-alignment: along; text-background-mode: rounded-box; text-background-color : white;");
+            
+            return label;
+    }
+    
+    private void labelCheckCentres(){
+        for(Node centre : grapheActuel.getEachNode()){
+            String label = "";
+            
+            if(checkNom.isSelected()){
+                label = centre.getId() + label;
+            }
+            if(checkType.isSelected()){
+                if(!label.equals("")){
+                    label += " | ";
+                }
+                label += centre.getAttribute("type");
+            }
+            centre.addAttribute("ui.label", label);
+        }
+    }
+    
+    private void visuSeuil() {
+        seuil_cpt.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                for (Edge route : grapheActuel.getEachEdge()) {
+                    double fiaRoute = (route.getAttribute("fiabilite"));
+                    double seuil = (double) seuil_cpt.getValue();
+                    if (fiaRoute < seuil) {
+                        route.setAttribute("ui.label", "⚠");
+                        route.setAttribute("ui.style", "text-size: 25; text-color: RED;");
+                    }
+                    else {
+                        labelCheckRoute(route);
+                    }
+                }
+            }
+        });
+        }
+    
+    private JPanel InfosCouleursCentres(int type){
+        JPanel couleur = new JPanel();
+        switch(type){
+            case 0 : couleur.setBackground(Color.decode("#93FA8F")); break;
+            case 1 : couleur.setBackground(Color.decode("#FA8FF1")); break;
+            case 2 : couleur.setBackground(Color.decode("#8FB6FA")); break;
+        }
+        couleur.setPreferredSize(new Dimension(15,15));
+        couleur.setVisible(true);
+        couleur.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        return couleur;
+    }
+    
+    private void gererTailleTextes(){
+        Font police = new Font("Arial", Font.ROMAN_BASELINE, 16);
+        Font policeTitre = new Font("Arial", Font.BOLD, 17);
+        //PARTIE HAUT
+        //Nouvelle-map
+        nom_m.setFont(policeTitre);
+        btNouvelle_map.setFont(police);
+        //Véhicules
+        vehicule.setFont(policeTitre);
+        intervention.setFont(police);
+        //Centres
+        type_centre.setFont(policeTitre);
+        nutrition.setFont(police);
+        nbr_n.setFont(police);
+        couleur_n.setFont(police);
+        maternite.setFont(police);
+        nbr_m.setFont(police);
+        couleur_m.setFont(police);
+        bloc_operatoire.setFont(police);
+        nbr_bo.setFont(police);
+        couleur_bo.setFont(police);
+        //Nouveau trajets
+         btNouveau_trajet.setFont(police);
+         //MAP
+         coutEtTrajet.setFont(police);
+         coutEtTrajetV2.setFont(police);
+         //PARTIE EST 
+        titreComboC.setFont(policeTitre);
+        //MENU
+        menuCentres.setFont(policeTitre);
+        menuRoutes.setFont(policeTitre);
+        menuSeuil.setFont(policeTitre);
+        checkType.setFont(police);
+        checkNom.setFont(police);
+        checkFia.setFont(police);
+        checkDuree.setFont(police);
+        checkDistance.setFont(police);
+        seuil_cpt.setFont(police);
+    }
+}

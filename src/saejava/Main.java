@@ -1,16 +1,13 @@
 package saejava;
 
-import saejava.classes.MonGraphe;
-import org.graphstream.graph.Graph;
+import Fenetre.MaFenetre;
 
 public class Main {
 
-    public static void main(String[] args) {
-        System.out.println("Test");
-        Graph gtest = MonGraphe.chargerGraphe("graphe2.csv");
-        System.out.println("Sommets : " + gtest.getNodeCount());
-        System.out.println("Routes : " + gtest.getEdgeCount());
-        gtest.display();
-    }
+    public static void main(String[] args) { 
+        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        new MaFenetre();
     
+    }
+
 }
