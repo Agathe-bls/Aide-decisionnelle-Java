@@ -1,4 +1,5 @@
 # Application d'aide décisionnelle pour des centres de santé
+[Aperçu de l'application](capture.png)
 
 ## Description
   Cette application est un projet de groupe réalisé dans le cadre de cours de deuxième année de BUT informatique de Villeurbanne Doua.
