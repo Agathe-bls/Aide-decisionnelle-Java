@@ -50,6 +50,16 @@ Thumbs.db
 *.war
 *.ear
 *.zip
+
+# Dossier private à la racine (chemins personnels NetBeans)
+private/
+
+# Crash JVM
+hs_err_pid*
+replay_pid*
+
+# Exécutables
+*.exe
 *.tar.gz
 
 # On versionne les librairies Java du projet
